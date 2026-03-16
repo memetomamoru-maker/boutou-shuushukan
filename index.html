@@ -403,6 +403,8 @@ body::before {
 }
 .share-btn-save { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
 .share-btn-save:active { background: rgba(255,255,255,.18); }
+.share-btn-x { background: #000; color: #fff; border-color: rgba(255,255,255,.3); }
+.share-btn-x:active { background: #1a1a1a; }
 .share-btn-cancel { background: none; color: rgba(255,255,255,.3); }
 .share-btn-cancel:active { background: rgba(255,255,255,.06); }
 
@@ -566,8 +568,9 @@ body[data-genre="社会・風俗"] #bg-overlay { background: radial-gradient(ell
       </div>
     </div>
     <div class="share-btns" style="margin-top:12px">
-      <button class="share-btn-save" id="share-save-btn">画像として保存</button>
-      <button class="share-btn-cancel" id="share-cancel-btn">とじる</button>
+      <button class="share-btn-save" id="share-save-btn">画像保存</button>
+      <button class="share-btn-x" id="share-x-btn">𝕏 でシェア</button>
+      <button class="share-btn-cancel" id="share-cancel-btn">✕</button>
     </div>
   </div>
 </div>
@@ -579,49 +582,44 @@ body[data-genre="社会・風俗"] #bg-overlay { background: radial-gradient(ell
 (function(){
   const canvas = document.getElementById('ink-canvas');
   const ctx = canvas.getContext('2d');
+  const app = document.getElementById('app');
   let W, H, drops = [];
 
   function resize(){
-    W = canvas.width  = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
+    W = canvas.width  = app.offsetWidth  || window.innerWidth;
+    H = canvas.height = app.offsetHeight || window.innerHeight;
   }
-  resize();
-  window.addEventListener('resize', resize);
 
   function randomDrop(){
     return {
       x: Math.random() * W,
       y: Math.random() * H,
       r: 0,
-      maxR: 60 + Math.random() * 120,
-      alpha: 0.06 + Math.random() * 0.06,
-      speed: 0.18 + Math.random() * 0.22,
+      maxR: 80 + Math.random() * 140,
+      alpha: 0.12 + Math.random() * 0.10,
+      speed: 0.3 + Math.random() * 0.35,
       done: false
     };
   }
 
-  // 初期に数個配置
-  for(let i=0;i<5;i++) drops.push(randomDrop());
-
   let lastSpawn = 0;
   function frame(ts){
     ctx.clearRect(0,0,W,H);
-    if(ts - lastSpawn > 3200){
+    if(ts - lastSpawn > 2500){
       drops.push(randomDrop());
       lastSpawn = ts;
-      // 古いものを削除
-      if(drops.length > 12) drops.shift();
+      if(drops.length > 10) drops.shift();
     }
-    drops.forEach(d=>{
+    drops.forEach(function(d){
       if(d.done) return;
       d.r += d.speed;
       const progress = d.r / d.maxR;
       const a = d.alpha * (1 - progress * progress);
-      if(a <= 0.002){ d.done = true; return; }
+      if(a <= 0.003){ d.done = true; return; }
       const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r);
-      grad.addColorStop(0,   `rgba(200,180,140,${a})`);
-      grad.addColorStop(0.5, `rgba(140,120,80,${a * 0.5})`);
-      grad.addColorStop(1,   `rgba(80,60,30,0)`);
+      grad.addColorStop(0,   'rgba(210,190,150,' + a + ')');
+      grad.addColorStop(0.4, 'rgba(150,120,80,'  + (a*0.6) + ')');
+      grad.addColorStop(1,   'rgba(60,40,20,0)');
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
       ctx.fillStyle = grad;
@@ -629,7 +627,23 @@ body[data-genre="社会・風俗"] #bg-overlay { background: radial-gradient(ell
     });
     requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+
+  function startInk(){
+    resize();
+    window.addEventListener('resize', resize);
+    for(var i=0;i<6;i++){
+      var d = randomDrop();
+      d.r = Math.random() * d.maxR * 0.5;
+      drops.push(d);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', startInk);
+  } else {
+    startInk();
+  }
 })();
 
 // ===== CONSTANTS =====
@@ -951,6 +965,26 @@ document.getElementById('btn-share').addEventListener('click',()=>{
 });
 
 document.getElementById('share-cancel-btn').addEventListener('click',()=>{
+  document.getElementById('share-overlay').classList.remove('show');
+});
+
+document.getElementById('share-x-btn').addEventListener('click',()=>{
+  const w = list[cur]; if(!w) return;
+  const text = textCache[w.path] || '';
+  // 冒頭の最初の一文（句点まで）を取得
+  const firstSentence = (()=>{
+    const idx = text.indexOf('。');
+    return idx !== -1 ? text.slice(0, idx+1) : text.slice(0, 40);
+  })();
+  const tweetText = `${firstSentence}
+
+― ${w.author}『${w.title}』
+
+#冒頭収集館`;
+  const url = 'https://boutou-shuushukan.vercel.app';
+  const xUrl = 'https://twitter.com/intent/tweet?text=' +
+    encodeURIComponent(tweetText) + '&url=' + encodeURIComponent(url);
+  window.open(xUrl, '_blank', 'noopener');
   document.getElementById('share-overlay').classList.remove('show');
 });
 
