@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>冒頭収集館</title>
+<meta name="theme-color" content="#050505">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+<link rel="apple-touch-icon" href="./icon-512.png">
+<link rel="manifest" href="./site.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -17,11 +21,27 @@ html,body{
   overscroll-behavior-x:none;
 }
 
-/* PC背景グリッド */
+/* PCだけ背景画像を表示 */
 body::before{
-  content:'';position:fixed;inset:0;
-  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
-  background-size:40px 40px;pointer-events:none;z-index:0;
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+
+@media (max-width: 767px){
+  body::before{
+    background:none;
+  }
+}
+
+@media (min-width: 768px){
+  body::before{
+    background:
+      linear-gradient(rgba(0,0,0,.52), rgba(0,0,0,.52)),
+      url("./bg-silhouette.png") center center / cover no-repeat;
+  }
 }
 
 #app{
