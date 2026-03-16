@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>冒頭収集館</title>
-<meta name="theme-color" content="#050505">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
 <link rel="apple-touch-icon" href="./icon-512.png">
 <link rel="manifest" href="./site.webmanifest">
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{--dur:.48s;--ease:cubic-bezier(.76,0,.24,1);}
@@ -21,7 +20,7 @@ html,body{
   overscroll-behavior-x:none;
 }
 
-/* PCだけ背景画像を表示 */
+/* 背景 */
 body::before{
   content:'';
   position:fixed;
@@ -39,8 +38,13 @@ body::before{
 @media (min-width: 768px){
   body::before{
     background:
-      linear-gradient(rgba(0,0,0,.52), rgba(0,0,0,.52)),
-      url("./bg-silhouette.png") center center / cover no-repeat;
+      linear-gradient(rgba(0,0,0,.42), rgba(0,0,0,.42)),
+      url('./bg-silhouette.png') center center / cover no-repeat;
+  }
+
+  /* これが上から被って背景画像を消していた */
+  #grad-bg{
+    display:none !important;
   }
 }
 
