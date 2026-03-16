@@ -30,21 +30,7 @@ body::before{
   overflow:hidden;
 }
 
-/* ===== 墨滲み背景（CSS keyframes版） ===== */
-#ink-layer{
-  position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;
-}
-.ink-blob{
-  position:absolute;border-radius:50%;
-  background:radial-gradient(circle,rgba(210,185,140,.22) 0%,rgba(150,120,80,.10) 45%,transparent 70%);
-  animation:inkSpread var(--d,8s) ease-out var(--delay,0s) infinite both;
-}
-@keyframes inkSpread{
-  0%  {transform:scale(0);   opacity:0;}
-  10% {opacity:1;}
-  55% {transform:scale(1);   opacity:.8;}
-  100%{transform:scale(1.2); opacity:0;}
-}
+/* 墨滲みレイヤー削除済み */
 
 /* ===== DECK ===== */
 #deck{position:absolute;inset:0;touch-action:none;overscroll-behavior-x:none;z-index:2;}
@@ -88,8 +74,8 @@ body::before{
 /* TOP META */
 .card-top{position:relative;z-index:10;padding:16px 20px 0;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .genre-badge{
-  font-size:9px;font-weight:700;letter-spacing:3px;
-  padding:3px 8px;border:1px solid currentColor;opacity:.6;
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  padding:3px 10px;border:1px solid currentColor;opacity:.85;
 }
 .card[data-g="純文学"]    .genre-badge{color:#e8a04a;}
 .card[data-g="探偵・推理"] .genre-badge{color:#4a9cc8;}
@@ -98,13 +84,13 @@ body::before{
 .card[data-g="歴史・時代"] .genre-badge{color:#c88030;}
 .card[data-g="幻想・耽美"] .genre-badge{color:#30b060;}
 .card[data-g="社会・風俗"] .genre-badge{color:#40a060;}
-.pattern-name{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.2);}
+.pattern-name{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.28);}
 
 /* TEXT AREA */
 .card-text-wrap{
   flex:1;position:relative;z-index:5;
   display:flex;align-items:flex-start;justify-content:flex-end;
-  padding:16px 20px 84px; /* 下84px = actionbar分 */
+  padding:20px 24px 90px; /* 下90px = actionbar分 */
   overflow:hidden;
 }
 @keyframes textDrift{0%,100%{opacity:.92;}50%{opacity:1;}}
@@ -114,7 +100,7 @@ body::before{
 .card-text{
   writing-mode:vertical-rl;text-orientation:mixed;
   font-family:'Zen Old Mincho','Shippori Mincho',serif;
-  font-size:clamp(16px,4.2vw,21px);line-height:2.0;letter-spacing:.12em;
+  font-size:clamp(17px,4.5vw,22px);line-height:2.1;letter-spacing:.15em;
   color:rgba(240,228,210,.88);height:auto;overflow:visible;
 }
 
@@ -130,7 +116,7 @@ body::before{
   padding:8px 14px 16px;gap:8px;pointer-events:all;
 }
 .action-info{flex:1;min-width:0;}
-.action-author{font-size:13px;font-weight:700;color:rgba(240,228,210,.85);letter-spacing:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.action-author{font-size:14px;font-weight:700;color:rgba(240,228,210,.9);letter-spacing:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .action-title{font-size:10px;color:rgba(240,228,210,.35);letter-spacing:1px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .action-btns{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 
@@ -178,9 +164,9 @@ body::before{
 /* ===== HEADER ===== */
 #header-ui{position:absolute;top:0;right:0;z-index:300;display:flex;align-items:center;gap:6px;padding:14px 14px 0;}
 #btn-filter,#btn-guide{
-  width:34px;height:34px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-  border-radius:50%;color:rgba(255,255,255,.4);font-size:14px;
+  width:36px;height:36px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  border-radius:50%;color:rgba(255,255,255,.55);font-size:15px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .2s;touch-action:manipulation;
 }
@@ -203,6 +189,42 @@ body::before{
 @keyframes swipeIndAnim{0%{opacity:0;transform:translateX(-50%) translateY(0)}20%{opacity:.7}75%{opacity:.7;transform:translateX(-50%) translateY(-14px)}100%{opacity:0;transform:translateX(-50%) translateY(-22px)}}
 .swipe-ind-line{width:1px;height:28px;background:linear-gradient(to top,rgba(240,228,210,.6),transparent);}
 .swipe-ind-text{font-size:8px;letter-spacing:3px;color:rgba(240,228,210,.4);}
+
+
+/* ===== グラデーション背景アニメーション ===== */
+#grad-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  /* 大きめのグラデを動かしてローリング感を出す */
+  background-size: 400% 400%;
+  animation: gradFlow 12s ease infinite;
+}
+#grad-bg.active { opacity: 1; }
+
+@keyframes gradFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* スワイプ中はアニメーションを速く */
+#grad-bg.swiping {
+  animation-duration: 3s;
+  opacity: 0.85;
+}
+
+/* ジャンル別グラデーション */
+body[data-genre="純文学"]    #grad-bg { background-image: linear-gradient(135deg, #0a0806 0%, #2d1a08 25%, #1a0e04 50%, #261408 75%, #0a0806 100%); }
+body[data-genre="探偵・推理"] #grad-bg { background-image: linear-gradient(135deg, #050a14 0%, #0a1a2e 25%, #061020 50%, #0d2038 75%, #050a14 100%); }
+body[data-genre="怪談・怪異"] #grad-bg { background-image: linear-gradient(135deg, #080514 0%, #18082a 25%, #0e0618 50%, #1e0a30 75%, #080514 100%); }
+body[data-genre="恋愛・情念"] #grad-bg { background-image: linear-gradient(135deg, #0e0408 0%, #28081a 25%, #180610 50%, #220a14 75%, #0e0408 100%); }
+body[data-genre="歴史・時代"] #grad-bg { background-image: linear-gradient(135deg, #0a0604 0%, #241408 25%, #160a04 50%, #1e1006 75%, #0a0604 100%); }
+body[data-genre="幻想・耽美"] #grad-bg { background-image: linear-gradient(135deg, #040e08 0%, #082010 25%, #061408 50%, #0a2412 75%, #040e08 100%); }
+body[data-genre="社会・風俗"] #grad-bg { background-image: linear-gradient(135deg, #040e08 0%, #0a1e10 25%, #060e08 50%, #0c1c10 75%, #040e08 100%); }
 
 /* bg-overlay */
 #bg-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s,background .4s;}
@@ -227,7 +249,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
   transition:transform .35s var(--ease);display:flex;flex-direction:column;gap:8px;overflow-y:auto;
 }
 #filter-drawer.open #filter-panel{transform:translateX(0);visibility:visible;}
-.filter-label{font-size:9px;letter-spacing:4px;color:rgba(255,255,255,.2);margin-bottom:8px;}
+.filter-label{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.3);margin-bottom:10px;}
 .f-item{
   background:none;border:none;border-bottom:1px solid rgba(255,255,255,.05);
   color:rgba(255,255,255,.35);font-family:'Shippori Mincho',serif;
@@ -237,8 +259,8 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 .f-item:active,.f-item.on{color:rgba(255,255,255,.85);}
 .f-item.on::before{content:'— ';color:rgba(255,255,255,.3);}
 .filter-note-link{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.05);text-decoration:none;display:block;}
-.filter-note-inner{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.18);line-height:2;}
-.filter-note-inner span{display:block;font-size:11px;color:rgba(255,255,255,.3);}
+.filter-note-inner{font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.22);line-height:2;}
+.filter-note-inner span{display:block;font-size:13px;color:rgba(255,255,255,.4);margin:2px 0;}
 
 /* ===== SHELF DRAWER ===== */
 #shelf-drawer{position:absolute;inset:0;z-index:500;pointer-events:none;}
@@ -250,26 +272,26 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 }
 #shelf-drawer.open #shelf-panel{transform:translateY(0);}
 .shelf-hd{padding:52px 24px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;}
-.shelf-ttl{font-size:11px;letter-spacing:4px;color:rgba(255,255,255,.3);}
+.shelf-ttl{font-size:13px;letter-spacing:3px;color:rgba(255,255,255,.4);}
 .shelf-close{background:none;border:none;color:rgba(255,255,255,.25);font-size:18px;cursor:pointer;touch-action:manipulation;padding:4px;}
 #shelf-list-view,#shelf-reader-view{flex:1;overflow:hidden;display:flex;flex-direction:column;}
 #shelf-reader-view{display:none;}
 .shelf-bd{overflow-y:auto;padding:8px 24px 40px;flex:1;}
-.shelf-empty{text-align:center;color:rgba(255,255,255,.15);font-size:11px;letter-spacing:2px;padding:52px 0;line-height:3;}
+.shelf-empty{text-align:center;color:rgba(255,255,255,.2);font-size:13px;letter-spacing:1px;padding:52px 0;line-height:2.8;}
 .s-item{padding:16px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:14px;cursor:pointer;}
 .s-item:active{background:rgba(255,255,255,.02);}
 .s-info{flex:1;min-width:0;}
 .s-ttl{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:4px;letter-spacing:1px;}
-.s-auth{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+.s-auth{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:1px;}
 .s-arrow{color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0;}
 .reader-hd{padding:16px 24px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;}
 .reader-back{background:none;border:none;color:rgba(255,255,255,.3);font-size:16px;cursor:pointer;touch-action:manipulation;padding:4px 8px 4px 0;}
 .reader-meta{flex:1;}
-.reader-title{font-size:13px;color:rgba(255,255,255,.6);letter-spacing:1px;}
-.reader-author{font-size:10px;color:rgba(255,255,255,.25);letter-spacing:1px;margin-top:2px;}
+.reader-title{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:1px;}
+.reader-author{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-top:2px;}
 .reader-acts{display:flex;gap:8px;flex-shrink:0;}
-.reader-src{background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-family:'Shippori Mincho',serif;font-size:9px;padding:4px 10px;cursor:pointer;text-decoration:none;display:inline-block;letter-spacing:1px;touch-action:manipulation;}
-.reader-ret{background:none;border:1px solid rgba(200,100,40,.3);color:rgba(200,120,40,.6);font-family:'Shippori Mincho',serif;font-size:9px;padding:4px 10px;cursor:pointer;touch-action:manipulation;letter-spacing:1px;}
+.reader-src{background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);font-family:'Shippori Mincho',serif;font-size:11px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block;letter-spacing:1px;touch-action:manipulation;}
+.reader-ret{background:none;border:1px solid rgba(200,100,40,.4);color:rgba(200,120,40,.75);font-family:'Shippori Mincho',serif;font-size:11px;padding:8px 14px;cursor:pointer;touch-action:manipulation;letter-spacing:1px;}
 .reader-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px 20px 40px;-webkit-overflow-scrolling:touch;}
 .reader-text{writing-mode:vertical-rl;font-family:'Zen Old Mincho','Shippori Mincho',serif;font-size:17px;line-height:2.1;letter-spacing:.1em;color:rgba(240,228,210,.78);height:100%;min-height:calc(100vw - 40px);}
 
@@ -280,7 +302,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
   padding:32px 28px;opacity:0;pointer-events:none;transition:opacity .4s;
 }
 #guide-overlay.show{opacity:1;pointer-events:all;}
-.guide-title{font-family:'IM Fell English',serif;font-style:italic;font-size:11px;letter-spacing:4px;color:rgba(255,255,255,.3);margin-bottom:28px;}
+.guide-title{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;letter-spacing:4px;color:rgba(255,255,255,.4);margin-bottom:28px;}
 .guide-items{width:100%;display:flex;flex-direction:column;gap:16px;margin-bottom:36px;}
 .guide-item{display:flex;align-items:flex-start;gap:16px;}
 .guide-arrow{font-size:20px;width:32px;text-align:center;flex-shrink:0;color:rgba(255,255,255,.5);margin-top:2px;}
@@ -288,7 +310,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 .guide-desc strong{color:rgba(255,255,255,.85);display:block;font-size:13px;margin-bottom:1px;}
 .guide-close{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-family:'Shippori Mincho',serif;font-size:12px;letter-spacing:3px;padding:12px 32px;cursor:pointer;touch-action:manipulation;transition:all .2s;}
 .guide-close:active{background:rgba(255,255,255,.08);}
-.guide-note-link{margin-top:16px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.2);text-decoration:none;}
+.guide-note-link{margin-top:16px;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.3);text-decoration:none;}
 
 /* ===== シェアモーダル ===== */
 #share-overlay{
@@ -313,7 +335,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 .share-author-block{}
 .share-author{font-size:14px;font-weight:700;color:rgba(240,228,210,.75);letter-spacing:2px;}
 .share-work{font-size:10px;color:rgba(240,228,210,.35);letter-spacing:1px;margin-top:2px;}
-.share-app{font-family:'IM Fell English',serif;font-style:italic;font-size:9px;color:rgba(255,255,255,.15);letter-spacing:1px;text-align:right;line-height:2;}
+.share-app{font-family:'IM Fell English',serif;font-style:italic;font-size:11px;color:rgba(255,255,255,.2);letter-spacing:1px;text-align:right;line-height:2;}
 .share-actions{display:flex;gap:8px;margin-top:16px;}
 .share-actions button,.share-actions a{
   flex:1;padding:11px 0;font-family:'Shippori Mincho',serif;
@@ -334,10 +356,9 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 <body>
 
 <div id="bg-overlay"></div>
+<div id="grad-bg"></div>
 <div id="app">
 
-<!-- 墨滲みアニメーション層 -->
-<div id="ink-layer"></div>
 
 <div id="deck"></div>
 
@@ -368,8 +389,8 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
     </div>
     <div class="action-btns">
       <a class="action-btn" id="action-src" href="#" target="_blank" rel="noopener">原文</a>
-      <button class="action-icon-btn" id="btn-share" aria-label="シェア" title="シェア">↑</button>
-      <button class="action-icon-btn" id="btn-shelf" aria-label="書棚に保存">📚<span class="action-badge" id="shelf-badge"></span></button>
+      <button id="btn-share" aria-label="シェア" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65);font-family:'Shippori Mincho',serif;font-size:11px;letter-spacing:2px;padding:0 14px;height:38px;cursor:pointer;touch-action:manipulation;white-space:nowrap;transition:background .2s;-webkit-tap-highlight-color:transparent;flex-shrink:0;">シェア</button>
+      <button class="action-icon-btn" id="btn-shelf" aria-label="書棚に保存" style="font-size:18px;">📚<span class="action-badge" id="shelf-badge"></span></button>
     </div>
   </div>
 </div>
@@ -460,30 +481,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 </div><!-- /#app -->
 
 <script>
-// ===== 墨滲みアニメーション（CSS keyframes版）=====
-(function(){
-  const layer = document.getElementById('ink-layer');
-  const configs = [
-    {size:260, x:20,  y:15,  d:9,  delay:0},
-    {size:180, x:55,  y:60,  d:7,  delay:1.8},
-    {size:220, x:10,  y:40,  d:11, delay:3.5},
-    {size:300, x:35,  y:20,  d:13, delay:5.2},
-    {size:160, x:65,  y:70,  d:8,  delay:2.4},
-    {size:240, x:45,  y:50,  d:10, delay:7.0},
-    {size:200, x:75,  y:30,  d:9,  delay:4.1},
-    {size:280, x:15,  y:80,  d:12, delay:6.3},
-  ];
-  configs.forEach(function(c){
-    var el = document.createElement('div');
-    el.className = 'ink-blob';
-    el.style.cssText =
-      'width:'+c.size+'px;height:'+c.size+'px;'+
-      'left:'+c.x+'%;top:'+c.y+'%;'+
-      'margin-left:'+(-(c.size/2))+'px;margin-top:'+(-(c.size/2))+'px;'+
-      '--d:'+c.d+'s;--delay:'+c.delay+'s;';
-    layer.appendChild(el);
-  });
-})();
+// 墨滲みアニメーション削除済み
 
 // ===== CONSTANTS =====
 const BASE_URL   = 'https://raw.githubusercontent.com/aozorahack/aozorabunko_text/master/';
@@ -679,6 +677,9 @@ function updateActionBar(){
   if(se) se.href=toAozoraUrl(w.path);
   updateShelfBtn();
   document.body.setAttribute('data-genre', AUTHOR_GENRE[w.author]||'純文学');
+  // グラデーション背景を常時うっすら表示（swiping時は濃くなる）
+  var gb=document.getElementById('grad-bg');
+  if(gb) gb.classList.add('active');
 }
 
 function updateShelfBtn(){
@@ -720,8 +721,20 @@ function saveCurrentToShelf(){
   }
 }
 
-function showBgOverlay(){ document.getElementById('bg-overlay').classList.add('active'); cards[cur]&&cards[cur].classList.add('swiping-active'); }
-function hideBgOverlay(){ setTimeout(function(){document.getElementById('bg-overlay').classList.remove('active');},300); cards[cur]&&cards[cur].classList.remove('swiping-active'); }
+function showBgOverlay(){
+  document.getElementById('bg-overlay').classList.add('active');
+  var gb=document.getElementById('grad-bg');
+  if(gb){gb.classList.add('active');gb.classList.add('swiping');}
+  cards[cur]&&cards[cur].classList.add('swiping-active');
+}
+function hideBgOverlay(){
+  setTimeout(function(){
+    document.getElementById('bg-overlay').classList.remove('active');
+    var gb=document.getElementById('grad-bg');
+    if(gb) gb.classList.remove('swiping');
+  },300);
+  cards[cur]&&cards[cur].classList.remove('swiping-active');
+}
 
 // ===== SWIPE =====
 var ty0=0,tx0=0,swiping=false,swipeDelta=0;
