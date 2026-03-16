@@ -4,12 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>冒頭収集館</title>
-<meta name="theme-color" content="#050505">
-<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
-<link rel="apple-touch-icon" href="./icon-512.png">
-<link rel="manifest" href="./site.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+<link rel="apple-touch-icon" href="./icon-512.png">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{--dur:.48s;--ease:cubic-bezier(.76,0,.24,1);}
@@ -21,26 +19,29 @@ html,body{
   overscroll-behavior-x:none;
 }
 
-/* PCだけ背景画像を表示 */
+/* 背景 */
 body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-}
-
-@media (max-width: 767px){
-  body::before{
-    background:none;
-  }
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;z-index:0;
 }
 
 @media (min-width: 768px){
   body::before{
     background:
-      linear-gradient(rgba(0,0,0,.52), rgba(0,0,0,.52)),
-      url("./bg-silhouette.png") center center / cover no-repeat;
+      linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
+      url('./bg-silhouette.png') center center / cover no-repeat;
+  }
+
+  /* PCでは背景画像を見せるため、動くグラデをかなり薄くする */
+  #grad-bg,
+  #grad-bg.active{
+    opacity:.16 !important;
+  }
+
+  #bg-overlay,
+  #bg-overlay.active{
+    opacity:.22;
   }
 }
 
@@ -613,7 +614,41 @@ function buildCard(w, idx){
   return el;
 }
 
+function showLoadErrorCard(){
+  deck.innerHTML='';
+  cards=[];
+  var el=document.createElement('div');
+  el.className='card is-current';
+  el.dataset.g='純文学';
+  el.style.transform='translateY(0)';
+  el.style.opacity='1';
+  el.innerHTML=
+    '<div class="card-bg"></div>'+
+    '<div class="card-accent"></div>'+
+    '<div class="card-top">'+
+      '<span class="genre-badge">INFO</span>'+
+      '<span class="pattern-name">loading failed</span>'+
+    '</div>'+
+    '<div class="card-text-wrap">'+
+      '<div class="card-text">作品一覧を読み込めませんでした。少し待って再読み込みしてください。</div>'+
+    '</div>';
+  deck.appendChild(el);
+  cards=[el];
+  var ae=document.getElementById('action-author');
+  var te=document.getElementById('action-title');
+  var se=document.getElementById('action-src');
+  if(ae) ae.textContent='冒頭収集館';
+  if(te) te.textContent='作品一覧の読み込みに失敗しました';
+  if(se) se.href='#';
+  document.body.setAttribute('data-genre','純文学');
+  updateProgress();
+}
+
 function build(){
+  if(!list.length){
+    showLoadErrorCard();
+    return;
+  }
   deck.innerHTML=''; cards=[];
   list.forEach(function(w,i){
     var el = buildCard(w,i);
@@ -933,8 +968,20 @@ styleEl.textContent=
 document.head.appendChild(styleEl);
 
 async function init(){
-  try{ var r=await fetch('./booklist.json'); BOOKLIST=await r.json(); }
-  catch(e){ BOOKLIST=[]; }
+  var candidates=[
+    './booklist.json',
+    'https://raw.githubusercontent.com/memetomamoru-maker/boutou-shuushukan/main/booklist.json'
+  ];
+  BOOKLIST=[];
+  for(var i=0;i<candidates.length;i++){
+    try{
+      var r=await fetch(candidates[i],{cache:'no-store'});
+      if(!r.ok) continue;
+      BOOKLIST=await r.json();
+      if(Array.isArray(BOOKLIST) && BOOKLIST.length) break;
+    }catch(e){}
+  }
+  if(!Array.isArray(BOOKLIST)) BOOKLIST=[];
   list=[...BOOKLIST];
   build();
   if(!localStorage.getItem(GUIDE_KEY)){
