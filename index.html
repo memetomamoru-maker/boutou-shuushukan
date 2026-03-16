@@ -23,6 +23,8 @@ html, body {
   font-family: 'Shippori Mincho', serif;
   user-select: none;
   -webkit-user-select: none;
+  /* iOS Safari のブラウザバック/フォワードスワイプを完全ブロック */
+  overscroll-behavior-x: none;
 }
 
 /* PC：中央に固定幅で表示 */
@@ -56,6 +58,7 @@ body::before {
   position: absolute;
   inset: 0;
   touch-action: none;
+  overscroll-behavior-x: none;
 }
 
 /* ==============================
@@ -359,38 +362,6 @@ body::before {
 }
 #btn-filter:active { background: rgba(255,255,255,.12); }
 
-/* 書棚ボタン */
-#btn-shelf {
-  position: absolute;
-  top: 64px;
-  right: 20px;
-  z-index: 300;
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 50%;
-  color: rgba(255,255,255,.4);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .2s;
-  touch-action: manipulation;
-}
-#btn-shelf:active { background: rgba(255,255,255,.12); }
-.shelf-badge {
-  position: absolute;
-  top: -4px; right: -4px;
-  width: 16px; height: 16px;
-  background: #c4621a;
-  border-radius: 50%;
-  font-size: 9px;
-  color: #fff;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-family: sans-serif;
-}
-
 /* インジケーター */
 #progress {
   position: absolute;
@@ -628,6 +599,18 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 .swipe-ind-line{width:1px;height:28px;background:linear-gradient(to top,rgba(240,228,210,.6),transparent);}
 .swipe-ind-text{font-size:8px;letter-spacing:3px;color:rgba(240,228,210,.4);}
 
+/* ===== 書棚保存フィードバック：ポヨンアニメーション ===== */
+@keyframes shelfBounce {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.55); }
+  50%  { transform: scale(0.85); }
+  75%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.action-shelf-btn.bounce {
+  animation: shelfBounce 0.5s ease forwards;
+}
+
 /* ===== action bar ===== */
 #action-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:400;background:linear-gradient(to top,rgba(5,5,5,.95) 0%,rgba(5,5,5,.5) 70%,transparent 100%);pointer-events:none;}
 .action-bar-inner{display:flex;align-items:center;padding:10px 16px 12px;gap:12px;pointer-events:all;}
@@ -840,7 +823,8 @@ function buildCard(w, idx) {
   el.querySelector('.btn-lend').addEventListener('click', e => {
     e.stopPropagation();
     const id = e.currentTarget.dataset.id;
-    if (lending.has(id)) {
+    const wasSaved = lending.has(id);
+    if (wasSaved) {
       lending.delete(id);
     } else {
       lending.set(id, { title: w.title, author: w.author, path: w.path, text: textCache[w.path] || null });
@@ -848,7 +832,8 @@ function buildCard(w, idx) {
     const isLent = lending.has(id);
     e.currentTarget.classList.toggle('is-lent', isLent);
     e.currentTarget.textContent = isLent ? '返却' : '借出す';
-    updateBadge();
+    // 保存時だけバウンスアニメーション発火
+    updateBadge(!wasSaved);
   });
 
   return el;
@@ -1037,7 +1022,21 @@ function applyFilter() {
 }
 
 // ===== SHELF =====
-function updateBadge(){const n=lending.size,b=document.getElementById('shelf-badge');if(b){b.style.display=n>0?'flex':'none';b.textContent=n;}const sb=document.getElementById('btn-shelf');if(sb)sb.classList.toggle('has-items',n>0);}
+function updateBadge(withBounce){
+  const n=lending.size,b=document.getElementById('shelf-badge');
+  if(b){b.style.display=n>0?'flex':'none';b.textContent=n;}
+  const sb=document.getElementById('btn-shelf');
+  if(sb){
+    sb.classList.toggle('has-items',n>0);
+    if(withBounce){
+      sb.classList.remove('bounce');
+      // 強制リフロー（クラスを一瞬外すことで再発火させる）
+      void sb.offsetWidth;
+      sb.classList.add('bounce');
+      sb.addEventListener('animationend',()=>sb.classList.remove('bounce'),{once:true});
+    }
+  }
+}
 
 document.getElementById('btn-shelf').addEventListener('click', () => {
   document.getElementById('shelf-drawer').classList.add('open');
@@ -1079,7 +1078,7 @@ async function showReader(id) {
 
   document.getElementById('reader-ret').onclick = () => {
     lending.delete(id);
-    updateBadge();
+    updateBadge(false);
     // カードのボタンも更新
     const card = cards.find(c => c.dataset.id === id);
     if (card) {
