@@ -36,15 +36,14 @@ body::before{
 }
 .ink-blob{
   position:absolute;border-radius:50%;
-  background:radial-gradient(circle,rgba(200,175,130,.18) 0%,rgba(140,110,70,.08) 45%,transparent 70%);
-  animation:inkSpread var(--d,8s) ease-out var(--delay,0s) infinite;
-  transform:scale(0);opacity:0;
+  background:radial-gradient(circle,rgba(210,185,140,.22) 0%,rgba(150,120,80,.10) 45%,transparent 70%);
+  animation:inkSpread var(--d,8s) ease-out var(--delay,0s) infinite both;
 }
 @keyframes inkSpread{
   0%  {transform:scale(0);   opacity:0;}
-  15% {opacity:1;}
-  60% {transform:scale(1);   opacity:.7;}
-  100%{transform:scale(1.15);opacity:0;}
+  10% {opacity:1;}
+  55% {transform:scale(1);   opacity:.8;}
+  100%{transform:scale(1.2); opacity:0;}
 }
 
 /* ===== DECK ===== */
@@ -178,14 +177,14 @@ body::before{
 
 /* ===== HEADER ===== */
 #header-ui{position:absolute;top:0;right:0;z-index:300;display:flex;align-items:center;gap:6px;padding:14px 14px 0;}
-#btn-filter{
+#btn-filter,#btn-guide{
   width:34px;height:34px;
   background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
   border-radius:50%;color:rgba(255,255,255,.4);font-size:14px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .2s;touch-action:manipulation;
 }
-#btn-filter:active{background:rgba(255,255,255,.12);}
+#btn-filter:active,#btn-guide:active{background:rgba(255,255,255,.12);}
 
 #card-counter{
   position:absolute;top:18px;left:50%;transform:translateX(-50%);
@@ -344,6 +343,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 
 <!-- ヘッダー右上 -->
 <div id="header-ui">
+  <button id="btn-guide" aria-label="使い方" title="使い方">?</button>
   <button id="btn-filter" aria-label="ジャンル">≡</button>
 </div>
 
@@ -873,8 +873,9 @@ document.getElementById('share-img-btn').addEventListener('click',async function
 });
 document.getElementById('share-x-btn').addEventListener('click',function(){
   var w=list[cur]; if(!w)return;
-  var sentence=document.getElementById('share-sentence').textContent;
-  var tweetText=sentence+'\n\n― '+w.author+'『'+w.title+'』\n\n#冒頭収集館';
+  var tweetText=
+    w.author+'『'+w.title+'』の冒頭を収集しました。\n\n'+
+    '#冒頭収集館 #青空文庫';
   var url='https://boutou-shuushukan.vercel.app';
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweetText)+'&url='+encodeURIComponent(url),'_blank','noopener');
   document.getElementById('share-overlay').classList.remove('show');
@@ -885,6 +886,9 @@ var GUIDE_KEY='boutou_guide_v1';
 document.getElementById('guide-close').addEventListener('click',function(){
   document.getElementById('guide-overlay').classList.remove('show');
   localStorage.setItem(GUIDE_KEY,'done');
+});
+document.getElementById('btn-guide').addEventListener('click',function(){
+  document.getElementById('guide-overlay').classList.add('show');
 });
 
 // ===== 初期化 =====
