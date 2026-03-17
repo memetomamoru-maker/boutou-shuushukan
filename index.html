@@ -97,7 +97,7 @@ body::before{
 .card[data-g="社会・風俗"] .card-accent{background:linear-gradient(90deg,#2a6a40,#40a060,transparent);}
 
 /* TOP META */
-.card-top{position:relative;z-index:10;padding:16px 20px 0;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.card-top{position:relative;z-index:10;padding:14px 20px 0;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .genre-badge{
   font-size:11px;font-weight:700;letter-spacing:2px;
   padding:3px 10px;border:1px solid currentColor;opacity:.85;
@@ -109,7 +109,15 @@ body::before{
 .card[data-g="歴史・時代"] .genre-badge{color:#c88030;}
 .card[data-g="幻想・耽美"] .genre-badge{color:#30b060;}
 .card[data-g="社会・風俗"] .genre-badge{color:#40a060;}
-.pattern-name{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.28);}
+
+/* 今日の冒頭バッジ（card-top内の右端） */
+.today-badge{
+  margin-left:auto;flex-shrink:0;
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.35);
+  white-space:nowrap;border:1px solid rgba(255,255,255,.15);
+  padding:2px 8px;
+}
 
 /* TEXT AREA */
 .card-text-wrap{
@@ -209,61 +217,106 @@ body::before{
 .prog-dot{width:2px;height:2px;border-radius:1px;background:rgba(255,255,255,.18);transition:all .3s;}
 .prog-dot.on{height:18px;background:rgba(255,255,255,.45);}
 
-/* 今日の冒頭バッジ */
-.today-badge{
-  position:absolute;top:14px;left:50%;transform:translateX(-50%);
-  z-index:20;pointer-events:none;
-  font-family:'IM Fell English',serif;font-style:italic;
-  font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.28);
-  white-space:nowrap;
-}
-.today-badge::before{
-  content:'';display:inline-block;width:16px;height:1px;
-  background:rgba(255,255,255,.2);vertical-align:middle;margin-right:6px;
-}
-.today-badge::after{
-  content:'';display:inline-block;width:16px;height:1px;
-  background:rgba(255,255,255,.2);vertical-align:middle;margin-left:6px;
-}
+
 #swipe-indicator{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;opacity:0;animation:swipeIndAnim 3s ease 1.5s 1 forwards;}
 @keyframes swipeIndAnim{0%{opacity:0;transform:translateX(-50%) translateY(0)}20%{opacity:.7}75%{opacity:.7;transform:translateX(-50%) translateY(-14px)}100%{opacity:0;transform:translateX(-50%) translateY(-22px)}}
 .swipe-ind-line{width:1px;height:28px;background:linear-gradient(to top,rgba(240,228,210,.6),transparent);}
 .swipe-ind-text{font-size:8px;letter-spacing:3px;color:rgba(240,228,210,.4);}
 
 
-/* ===== グラデーション背景アニメーション ===== */
+/* ===== オーロラ背景アニメーション ===== */
 #grad-bg {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1.2s ease;
-  background-size: 400% 400%;
-  animation: gradFlow 12s ease infinite;
+  transition: opacity 1.5s ease;
+  overflow: hidden;
 }
 #grad-bg.active { opacity: 1; }
 
-@keyframes gradFlow {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* オーロラ本体：3枚の楕円レイヤーを独立して動かす */
+#grad-bg::before,
+#grad-bg::after,
+#grad-bg .aurora-mid {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
 }
 
-/* スワイプ中はアニメーションを速く */
-#grad-bg.swiping {
-  animation-duration: 3s;
-  opacity: 0.85;
+/* レイヤー1：大きい・ゆっくり */
+#grad-bg::before {
+  width: 120%; height: 60%;
+  top: 20%; left: -10%;
+  animation: aurora1 18s ease-in-out infinite;
+  opacity: 0;
+}
+/* レイヤー2：中・斜め移動 */
+#grad-bg::after {
+  width: 90%; height: 50%;
+  top: 30%; left: 5%;
+  animation: aurora2 14s ease-in-out infinite 3s;
+  opacity: 0;
+}
+/* レイヤー3：小さい・速め */
+#grad-bg .aurora-mid {
+  width: 70%; height: 40%;
+  top: 35%; left: 15%;
+  animation: aurora3 10s ease-in-out infinite 6s;
+  opacity: 0;
 }
 
-/* ジャンル別グラデーション */
-body[data-genre="純文学"]    #grad-bg { background-image: linear-gradient(135deg, #0a0806 0%, #2d1a08 25%, #1a0e04 50%, #261408 75%, #0a0806 100%); }
-body[data-genre="探偵・推理"] #grad-bg { background-image: linear-gradient(135deg, #050a14 0%, #0a1a2e 25%, #061020 50%, #0d2038 75%, #050a14 100%); }
-body[data-genre="怪談・怪異"] #grad-bg { background-image: linear-gradient(135deg, #080514 0%, #18082a 25%, #0e0618 50%, #1e0a30 75%, #080514 100%); }
-body[data-genre="恋愛・情念"] #grad-bg { background-image: linear-gradient(135deg, #0e0408 0%, #28081a 25%, #180610 50%, #220a14 75%, #0e0408 100%); }
-body[data-genre="歴史・時代"] #grad-bg { background-image: linear-gradient(135deg, #0a0604 0%, #241408 25%, #160a04 50%, #1e1006 75%, #0a0604 100%); }
-body[data-genre="幻想・耽美"] #grad-bg { background-image: linear-gradient(135deg, #040e08 0%, #082010 25%, #061408 50%, #0a2412 75%, #040e08 100%); }
-body[data-genre="社会・風俗"] #grad-bg { background-image: linear-gradient(135deg, #040e08 0%, #0a1e10 25%, #060e08 50%, #0c1c10 75%, #040e08 100%); }
+@keyframes aurora1 {
+  0%   { transform: translateX(0%)   translateY(0%)  scaleY(1);   opacity: 0.18; }
+  30%  { transform: translateX(8%)   translateY(-8%) scaleY(1.2); opacity: 0.28; }
+  60%  { transform: translateX(-5%)  translateY(5%)  scaleY(0.9); opacity: 0.22; }
+  100% { transform: translateX(0%)   translateY(0%)  scaleY(1);   opacity: 0.18; }
+}
+@keyframes aurora2 {
+  0%   { transform: translateX(0%)   translateY(0%)  rotate(0deg);   opacity: 0.14; }
+  40%  { transform: translateX(-10%) translateY(6%)  rotate(8deg);   opacity: 0.24; }
+  70%  { transform: translateX(6%)   translateY(-4%) rotate(-5deg);  opacity: 0.16; }
+  100% { transform: translateX(0%)   translateY(0%)  rotate(0deg);   opacity: 0.14; }
+}
+@keyframes aurora3 {
+  0%   { transform: translateX(0%)   translateY(0%)  scale(1);    opacity: 0.10; }
+  35%  { transform: translateX(12%)  translateY(-6%) scale(1.15); opacity: 0.20; }
+  65%  { transform: translateX(-8%)  translateY(8%)  scale(0.85); opacity: 0.12; }
+  100% { transform: translateX(0%)   translateY(0%)  scale(1);    opacity: 0.10; }
+}
+
+/* ジャンル別カラー（3レイヤー分） */
+body[data-genre="純文学"]    #grad-bg::before { background: radial-gradient(ellipse, #c4621a 0%, transparent 70%); }
+body[data-genre="純文学"]    #grad-bg::after  { background: radial-gradient(ellipse, #8a3a0a 0%, transparent 70%); }
+body[data-genre="純文学"]    #grad-bg .aurora-mid { background: radial-gradient(ellipse, #e8a04a 0%, transparent 70%); }
+
+body[data-genre="探偵・推理"] #grad-bg::before { background: radial-gradient(ellipse, #1a4a8a 0%, transparent 70%); }
+body[data-genre="探偵・推理"] #grad-bg::after  { background: radial-gradient(ellipse, #0a2a5a 0%, transparent 70%); }
+body[data-genre="探偵・推理"] #grad-bg .aurora-mid { background: radial-gradient(ellipse, #4a9cc8 0%, transparent 70%); }
+
+body[data-genre="怪談・怪異"] #grad-bg::before { background: radial-gradient(ellipse, #6a1a9a 0%, transparent 70%); }
+body[data-genre="怪談・怪異"] #grad-bg::after  { background: radial-gradient(ellipse, #3a0a6a 0%, transparent 70%); }
+body[data-genre="怪談・怪異"] #grad-bg .aurora-mid { background: radial-gradient(ellipse, #a050d0 0%, transparent 70%); }
+
+body[data-genre="恋愛・情念"] #grad-bg::before { background: radial-gradient(ellipse, #8a1a3a 0%, transparent 70%); }
+body[data-genre="恋愛・情念"] #grad-bg::after  { background: radial-gradient(ellipse, #5a0a20 0%, transparent 70%); }
+body[data-genre="恋愛・情念"] #grad-bg .aurora-mid { background: radial-gradient(ellipse, #d04070 0%, transparent 70%); }
+
+body[data-genre="歴史・時代"] #grad-bg::before { background: radial-gradient(ellipse, #8a5010 0%, transparent 70%); }
+body[data-genre="歴史・時代"] #grad-bg::after  { background: radial-gradient(ellipse, #5a3008 0%, transparent 70%); }
+body[data-genre="歴史・時代"] #grad-bg .aurora-mid { background: radial-gradient(ellipse, #c88030 0%, transparent 70%); }
+
+body[data-genre="幻想・耽美"] #grad-bg::before { background: radial-gradient(ellipse, #0a6a30 0%, transparent 70%); }
+body[data-genre="幻想・耽美"] #grad-bg::after  { background: radial-gradient(ellipse, #064a20 0%, transparent 70%); }
+body[data-genre="幻想・耽美"] #grad-bg .aurora-mid { background: radial-gradient(ellipse, #30b060 0%, transparent 70%); }
+
+body[data-genre="社会・風俗"] #grad-bg::before { background: radial-gradient(ellipse, #0a5a2a 0%, transparent 70%); }
+body[data-genre="社会・風俗"] #grad-bg::after  { background: radial-gradient(ellipse, #063a1a 0%, transparent 70%); }
+body[data-genre="社会・風俗"] #grad-bg .aurora-mid { background: radial-gradient(ellipse, #40a060 0%, transparent 70%); }
 
 /* bg-overlay */
 #bg-overlay{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s,background .4s;}
@@ -298,6 +351,13 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 .f-item:active,.f-item.on{color:rgba(255,255,255,.85);}
 .f-item.on::before{content:'— ';color:rgba(255,255,255,.3);}
 .filter-note-link{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.05);text-decoration:none;display:block;}
+.author-pill{
+  font-family:'Shippori Mincho',serif;font-size:11px;letter-spacing:1px;
+  color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);padding:4px 10px;
+  cursor:pointer;transition:all .15s;touch-action:manipulation;white-space:nowrap;
+}
+.author-pill:active,.author-pill.on{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.08);}
 .filter-note-inner{font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.22);line-height:2;}
 .filter-note-inner span{display:block;font-size:13px;color:rgba(255,255,255,.4);margin:2px 0;}
 
@@ -397,7 +457,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 <div id="app">
 
 <div id="bg-overlay"></div>
-<div id="grad-bg"></div>
+<div id="grad-bg"><div class="aurora-mid"></div></div>
 
 
 <div id="deck"></div>
@@ -440,6 +500,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
   <div id="filter-backdrop"></div>
   <div id="filter-panel">
     <div class="filter-label">GENRE <span id="filter-count" style="font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.18);margin-left:4px;"></span></div>
+    <button class="f-item" data-f="today" id="f-today">今日の冒頭</button>
     <button class="f-item on" data-f="all">すべて</button>
     <button class="f-item" data-f="純文学">純文学</button>
     <button class="f-item" data-f="探偵・推理">探偵・推理</button>
@@ -448,6 +509,9 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
     <button class="f-item" data-f="歴史・時代">歴史・時代</button>
     <button class="f-item" data-f="幻想・耽美">幻想・耽美</button>
     <button class="f-item" data-f="社会・風俗">社会・風俗</button>
+    <!-- 作家一覧 -->
+    <div class="filter-label" style="margin-top:20px;">AUTHORS</div>
+    <div id="author-list" style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px;"></div>
     <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="filter-note-link">
       <div class="filter-note-inner">CREATED BY<span>@memetomamoru</span>note.com/memetomamoru</div>
     </a>
@@ -567,14 +631,26 @@ function cleanText(raw){
     .replace(/〔[^〕]*〕/g,'').replace(/［＃[^］]*］/g,'')
     .replace(/\r\n/g,'\n').replace(/\r/g,'\n')
     .replace(/\n{3,}/g,'\n\n').trim();
-  const cut = body.slice(0,350);
-  const lastKuten = cut.lastIndexOf('。');
-  const result = lastKuten !== -1 ? cut.slice(0,lastKuten+1) : cut.slice(0,200);
-  // 短すぎる場合は次の句点まで延長
-  if(result.length < 60){
-    const extended = body.slice(0,600);
-    const nextKuten = extended.indexOf('。', result.length + 1);
-    if(nextKuten !== -1) return extended.slice(0, nextKuten+1);
+
+  // 句点で終わる文章を60〜220文字の範囲で切り出す
+  const MAX = 220, MIN = 60;
+  let result = '';
+  let pos = 0;
+  while(pos < body.length && pos < MAX + 50){
+    const kuten = body.indexOf('。', pos);
+    if(kuten === -1) break;
+    const candidate = body.slice(0, kuten + 1);
+    if(candidate.length >= MIN){
+      result = candidate;
+      if(candidate.length >= MAX) break; // 十分な長さになったら止める
+    }
+    pos = kuten + 1;
+  }
+  // 一文も見つからない場合のフォールバック
+  if(!result){
+    result = body.slice(0, MAX);
+    const last = result.lastIndexOf('。');
+    if(last > 20) result = result.slice(0, last + 1);
   }
   return result;
 }
@@ -632,7 +708,6 @@ function buildCard(w, idx){
     '<div class="card-accent"></div>'+
     '<div class="card-top">'+
       '<span class="genre-badge">'+genre+'</span>'+
-      '<span class="pattern-name">loading...</span>'+
     '</div>'+
     '<div class="card-text-wrap">'+
       '<div class="card-text card-loading-txt">―　読み込み中　―</div>'+
@@ -697,10 +772,6 @@ function updateCardText(idx){
   if(!text) return;
   setCardText(card,text);
   if(shelf.has(w.id)) shelf.get(w.id).text=text;
-  var first=text.charAt(0);
-  var pattern=/「|『/.test(first)?'セリフ始まり':/[一-龠ぁ-ん]/.test(first)?'散文':'書き出し';
-  var pEl=card.querySelector('.pattern-name');
-  if(pEl) pEl.textContent=pattern;
 }
 
 function goTo(next){
@@ -872,16 +943,56 @@ document.querySelectorAll('.f-item').forEach(function(b){
     document.querySelectorAll('.f-item').forEach(function(x){x.classList.remove('on');});
     b.classList.add('on');
     filterVal=b.dataset.f;
+    filterAuthor=''; // ジャンル切替時は作家絞り込みリセット
+    document.querySelectorAll('.author-pill').forEach(function(p){p.classList.remove('on');});
     applyFilter();
     filterDrawer.classList.remove('open');
   });
 });
+var filterAuthor='';
+
 function applyFilter(){
   if(!BOOKLIST)return;
-  list=filterVal==='all'?[...BOOKLIST]:BOOKLIST.filter(function(w){return (AUTHOR_GENRE[w.author]||'純文学')===filterVal;});
+  var base=filterVal==='all'?[...BOOKLIST]:
+           filterVal==='today'?[...BOOKLIST]:
+           BOOKLIST.filter(function(w){return (AUTHOR_GENRE[w.author]||'純文学')===filterVal;});
+  if(filterAuthor){
+    base=base.filter(function(w){return w.author===filterAuthor;});
+  }
+  list=base;
   var fc=document.getElementById('filter-count');
   if(fc) fc.textContent='— '+list.length+'作品';
   build();
+  // 「今日の冒頭」フィルターの場合は先頭1枚だけ
+  if(filterVal==='today'){
+    list=[list[0]];
+    build();
+  }
+}
+
+function initAuthorList(){
+  if(!BOOKLIST)return;
+  var authors=[...new Set(BOOKLIST.map(function(w){return w.author;}))].sort();
+  var el=document.getElementById('author-list');
+  if(!el)return;
+  el.innerHTML=authors.map(function(a){
+    return '<button class="author-pill" data-author="'+a+'">'+a+'</button>';
+  }).join('');
+  el.querySelectorAll('.author-pill').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var author=btn.dataset.author;
+      if(filterAuthor===author){
+        filterAuthor='';
+        el.querySelectorAll('.author-pill').forEach(function(b){b.classList.remove('on');});
+      } else {
+        filterAuthor=author;
+        el.querySelectorAll('.author-pill').forEach(function(b){b.classList.remove('on');});
+        btn.classList.add('on');
+      }
+      applyFilter();
+      document.getElementById('filter-drawer').classList.remove('open');
+    });
+  });
 }
 
 // ===== SHELF =====
@@ -1010,6 +1121,7 @@ async function init(){
   list=[...BOOKLIST];
   var fc=document.getElementById('filter-count');
   if(fc) fc.textContent='— '+list.length+'作品';
+  initAuthorList();
   build();
   if(!localStorage.getItem(GUIDE_KEY)){
     document.getElementById('guide-overlay').classList.add('show');
