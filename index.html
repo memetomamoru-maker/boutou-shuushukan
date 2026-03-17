@@ -98,7 +98,8 @@ body::before{
 .card[data-g="社会・風俗"] .card-accent{background:linear-gradient(90deg,#2a6a40,#40a060,transparent);}
 
 /* TOP META */
-.card-top{position:relative;z-index:10;padding:14px 20px 0;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.card-top{position:relative;z-index:10;padding:14px 20px 0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;flex-shrink:0;}
+.card-top-row{display:flex;align-items:center;gap:10px;width:100%;}
 .genre-badge{
   font-size:11px;font-weight:700;letter-spacing:2px;
   padding:3px 10px;border:1px solid currentColor;opacity:.85;
@@ -111,13 +112,26 @@ body::before{
 .card[data-g="幻想・耽美"] .genre-badge{color:#30b060;}
 .card[data-g="社会・風俗"] .genre-badge{color:#40a060;}
 
-/* 今日の冒頭バッジ（card-top内の右端） */
+/* 今日の冒頭バッジ：ジャンルバッジの下に独立した行で */
 .today-badge{
-  margin-left:auto;flex-shrink:0;
   font-family:'IM Fell English',serif;font-style:italic;
-  font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.35);
-  white-space:nowrap;border:1px solid rgba(255,255,255,.15);
-  padding:2px 8px;
+  font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.4);
+  white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.today-badge::before{
+  content:'';display:inline-block;width:20px;height:1px;
+  background:rgba(255,255,255,.25);
+}
+/* 日付：テキスト右下に横書きで */
+.today-date{
+  position:absolute;
+  bottom:92px;right:24px;
+  z-index:10;pointer-events:none;
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;letter-spacing:2px;
+  color:rgba(255,255,255,.2);
+  writing-mode:horizontal-tb;
 }
 
 /* TEXT AREA */
@@ -215,7 +229,32 @@ body::before{
   align-items:center;justify-content:center;font-family:sans-serif;padding:0 3px;
 }
 
-/* ===== PC ナビ矢印 ===== */
+/* ===== PWAインストール訴求バナー（SP限定） ===== */
+#pwa-banner{
+  position:absolute;bottom:72px;left:12px;right:12px;
+  z-index:600;
+  background:rgba(10,8,6,.92);
+  border:1px solid rgba(255,255,255,.12);
+  padding:12px 14px;
+  display:none;
+  align-items:center;gap:12px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  animation:bannerUp .4s cubic-bezier(.76,0,.24,1) forwards;
+}
+@keyframes bannerUp{
+  from{transform:translateY(16px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
+}
+#pwa-banner.show{display:flex;}
+.pwa-icon{font-size:22px;flex-shrink:0;}
+.pwa-text{flex:1;min-width:0;}
+.pwa-text strong{display:block;font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.8);margin-bottom:2px;}
+.pwa-text span{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.35);line-height:1.5;}
+.pwa-close{background:none;border:none;color:rgba(255,255,255,.25);font-size:16px;cursor:pointer;padding:4px;flex-shrink:0;touch-action:manipulation;}
+@media (hover:hover) and (pointer:fine){
+  #pwa-banner{display:none!important;}
+}
 .pc-nav{
   display:none;
   position:absolute;bottom:80px;z-index:350;
@@ -535,6 +574,16 @@ body::before{
 <!-- 保存トースト -->
 <div id="saved-toast">保存しました</div>
 
+<!-- PWAインストール訴求バナー -->
+<div id="pwa-banner">
+  <div class="pwa-icon">📖</div>
+  <div class="pwa-text">
+    <strong>ホーム画面に追加する</strong>
+    <span>アプリとして毎日開けます<br>iOS: 共有 → ホーム画面に追加　Android: メニュー → アプリをインストール</span>
+  </div>
+  <button class="pwa-close" id="pwa-close">✕</button>
+</div>
+
 <!-- アクションバー -->
 <div id="action-bar">
   <div class="action-bar-inner">
@@ -786,7 +835,9 @@ function buildCard(w, idx){
     '<div class="card-bg"></div>'+
     '<div class="card-accent"></div>'+
     '<div class="card-top">'+
-      '<span class="genre-badge">'+genre+'</span>'+
+      '<div class="card-top-row">'+
+        '<span class="genre-badge">'+genre+'</span>'+
+      '</div>'+
     '</div>'+
     '<div class="card-text-wrap">'+
       '<div class="card-text card-loading-txt">―　読み込み中　―</div>'+
@@ -817,17 +868,18 @@ function build(){
     var el = buildCard(w,i);
     if(i===0){
       el.classList.add('is-current');
-      // 今日の冒頭バッジ＋日付
+      // 「今日の冒頭」バッジをジャンルバッジの下に追加
       var badge=document.createElement('div');
       badge.className='today-badge';
       badge.textContent='今日の冒頭';
       el.querySelector('.card-top').appendChild(badge);
-      // 日付を右下に薄く表示
+      // 日付をテキストエリア右下に横書きで
       var d=new Date();
-      var dateStr=(d.getMonth()+1)+'月'+d.getDate()+'日';
+      var month=d.getMonth()+1;
+      var day=d.getDate();
       var dateEl=document.createElement('div');
-      dateEl.style.cssText='position:absolute;bottom:92px;left:22px;z-index:10;font-family:\'IM Fell English\',serif;font-style:italic;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.15);pointer-events:none;writing-mode:vertical-rl;';
-      dateEl.textContent=dateStr;
+      dateEl.className='today-date';
+      dateEl.textContent=month+'.'+day;
       el.appendChild(dateEl);
     }
     deck.appendChild(el);
@@ -894,17 +946,7 @@ function updateProgress(){
     return '<div class="prog-dot'+(on?' on':'')+'"></div>';
   }).join('');
   var counter=document.getElementById('card-counter');
-  if(counter){
-    if(cur===0){
-      // 今日の冒頭カードは日付を表示
-      var d=new Date();
-      var month=d.getMonth()+1;
-      var day=d.getDate();
-      counter.textContent=month+' / '+day;
-    } else {
-      counter.textContent=(cur+1)+' / '+list.length;
-    }
-  }
+  if(counter) counter.textContent=(cur+1)+' / '+list.length;
 }
 
 function updateActionBar(){
@@ -1241,7 +1283,37 @@ document.getElementById('share-x-btn').addEventListener('click',function(){
   document.getElementById('share-overlay').classList.remove('show');
 });
 
-// ===== 使い方ガイド（初回のみ自動表示） =====
+// ===== PWAインストール訴求（SP・3回目以降） =====
+(function(){
+  // スタンドアロン（インストール済み）なら表示しない
+  if(window.matchMedia('(display-mode: standalone)').matches) return;
+  if(navigator.standalone) return; // iOS
+  // PCなら表示しない
+  if(window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+
+  var PWA_KEY='boutou_pwa_dismissed';
+  if(localStorage.getItem(PWA_KEY)) return;
+
+  // 訪問回数カウント
+  var visits=parseInt(localStorage.getItem('boutou_visits')||'0')+1;
+  localStorage.setItem('boutou_visits', visits);
+
+  // 3回目の訪問で表示
+  if(visits >= 3){
+    setTimeout(function(){
+      var banner=document.getElementById('pwa-banner');
+      if(banner) banner.classList.add('show');
+    }, 3000);
+  }
+
+  var closeBtn=document.getElementById('pwa-close');
+  if(closeBtn){
+    closeBtn.addEventListener('click',function(){
+      document.getElementById('pwa-banner').classList.remove('show');
+      localStorage.setItem(PWA_KEY,'1');
+    });
+  }
+})();
 var GUIDE_KEY='boutou_guide_v1';
 document.getElementById('guide-close').addEventListener('click',function(){
   document.getElementById('guide-overlay').classList.remove('show');
