@@ -194,6 +194,27 @@ body::before{
   align-items:center;justify-content:center;font-family:sans-serif;padding:0 3px;
 }
 
+/* ===== PC ナビ矢印 ===== */
+.pc-nav{
+  display:none;
+  position:absolute;bottom:80px;z-index:350;
+  width:48px;height:80px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.10);
+  color:rgba(255,255,255,.35);
+  font-size:20px;cursor:pointer;
+  align-items:center;justify-content:center;
+  transition:background .2s,color .2s;
+  touch-action:manipulation;
+}
+.pc-nav:hover{background:rgba(255,255,255,.10);color:rgba(255,255,255,.7);}
+.pc-nav:active{background:rgba(255,255,255,.16);}
+#nav-prev{left:0;border-radius:0 4px 4px 0;border-left:none;}
+#nav-next{right:0;border-radius:4px 0 0 4px;border-right:none;}
+@media (hover:hover) and (pointer:fine){
+  .pc-nav{display:flex;}
+}
+
 /* ===== HEADER ===== */
 #header-ui{position:absolute;top:0;right:0;z-index:300;display:flex;align-items:center;gap:6px;padding:14px 14px 0;}
 #btn-filter,#btn-guide{
@@ -377,8 +398,16 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 #shelf-reader-view{display:none;}
 .shelf-bd{overflow-y:auto;padding:8px 24px 40px;flex:1;}
 .shelf-empty{text-align:center;color:rgba(255,255,255,.2);font-size:13px;letter-spacing:1px;padding:52px 0;line-height:2.8;}
-.s-item{padding:16px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:14px;cursor:pointer;}
+.s-item{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:12px;cursor:pointer;}
 .s-item:active{background:rgba(255,255,255,.02);}
+.s-check{
+  flex-shrink:0;width:28px;height:28px;background:none;
+  border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.25);
+  font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;transition:all .15s;border-radius:50%;
+}
+.s-item.read .s-check{border-color:rgba(196,98,26,.5);color:rgba(240,160,74,.7);}
+.s-item.read .s-check:active,.s-check:active{background:rgba(255,255,255,.08);}
 .s-info{flex:1;min-width:0;}
 .s-ttl{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:4px;letter-spacing:1px;}
 .s-auth{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:1px;}
@@ -461,6 +490,10 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
 
 
 <div id="deck"></div>
+
+<!-- PC ナビ矢印 -->
+<button class="pc-nav" id="nav-prev" aria-label="前へ">↑</button>
+<button class="pc-nav" id="nav-next" aria-label="次へ">↓</button>
 
 <!-- ヘッダー右上 -->
 <div id="header-ui">
@@ -561,6 +594,13 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
         <div class="share-app">冒頭収集館</div>
       </div>
     </div>
+    <!-- 一言コメント -->
+    <textarea id="share-comment" placeholder="一言添えてシェア（任意）" maxlength="80"
+      style="width:100%;margin-top:10px;padding:10px 12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+      color:rgba(255,255,255,.7);font-family:'Shippori Mincho',serif;
+      font-size:12px;letter-spacing:1px;resize:none;height:52px;
+      line-height:1.6;outline:none;-webkit-appearance:none;"></textarea>
     <div class="share-actions">
       <button id="share-img-btn">画像保存</button>
       <button id="share-x-btn">𝕏 シェア</button>
@@ -738,11 +778,18 @@ function build(){
     var el = buildCard(w,i);
     if(i===0){
       el.classList.add('is-current');
-      // 今日の冒頭バッジ追加
+      // 今日の冒頭バッジ＋日付
       var badge=document.createElement('div');
       badge.className='today-badge';
       badge.textContent='今日の冒頭';
-      el.appendChild(badge);
+      el.querySelector('.card-top').appendChild(badge);
+      // 日付を右下に薄く表示
+      var d=new Date();
+      var dateStr=(d.getMonth()+1)+'月'+d.getDate()+'日';
+      var dateEl=document.createElement('div');
+      dateEl.style.cssText='position:absolute;bottom:88px;left:18px;z-index:10;font-family:\'IM Fell English\',serif;font-style:italic;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.15);pointer-events:none;writing-mode:horizontal-tb;';
+      dateEl.textContent=dateStr;
+      el.appendChild(dateEl);
     }
     deck.appendChild(el);
     cards.push(el);
@@ -882,33 +929,42 @@ function hideBgOverlay(){
 
 // ===== SWIPE =====
 var ty0=0,tx0=0,swiping=false,swipeDelta=0;
-deck.addEventListener('touchstart',function(e){
-  if(e.target.closest('button,a'))return;
+// action-bar より上の領域全体でスワイプ受付（ボタン類は除外）
+var swipeTarget=document.getElementById('app');
+swipeTarget.addEventListener('touchstart',function(e){
+  if(e.target.closest('button,a,#action-bar,#header-ui,#filter-drawer,#shelf-drawer,#share-overlay,#guide-overlay'))return;
   ty0=e.touches[0].clientY; tx0=e.touches[0].clientX;
   swiping=false; swipeDelta=0;
 },{passive:true});
-deck.addEventListener('touchmove',function(e){
-  if(e.target.closest('button,a'))return;
+swipeTarget.addEventListener('touchmove',function(e){
+  if(e.target.closest('button,a,#action-bar,#header-ui,#filter-drawer,#shelf-drawer,#share-overlay,#guide-overlay'))return;
   var dy=e.touches[0].clientY-ty0, dx=e.touches[0].clientX-tx0;
-  if(!swiping){ if(Math.abs(dy)>8&&Math.abs(dy)>Math.abs(dx)) swiping=true; else return; }
+  if(!swiping){ if(Math.abs(dy)>6&&Math.abs(dy)>Math.abs(dx)*0.8) swiping=true; else return; }
   e.preventDefault(); swipeDelta=dy; showBgOverlay();
   var card=cards[cur]; if(!card)return;
-  var resist=Math.abs(dy)>80?80+(Math.abs(dy)-80)*.15:Math.abs(dy);
+  var resist=Math.abs(dy)>60?60+(Math.abs(dy)-60)*.12:Math.abs(dy);
   card.style.transition='none';
   card.style.transform='translateY('+(dy>0?resist:-resist)+'px)';
 },{passive:false});
-deck.addEventListener('touchend',function(){
+swipeTarget.addEventListener('touchend',function(e){
+  if(e.target.closest('button,a,#action-bar,#header-ui,#filter-drawer,#shelf-drawer,#share-overlay,#guide-overlay'))return;
   hideBgOverlay();
   var card=cards[cur];
   if(card){card.style.transition='';card.style.transform='';}
   if(!swiping)return; swiping=false;
-  if(swipeDelta<-55) goTo(cur+1);
-  else if(swipeDelta>55) goTo(cur-1);
+  if(swipeDelta<-35) goTo(cur+1);
+  else if(swipeDelta>35) goTo(cur-1);
 },{passive:true});
-deck.addEventListener('touchcancel',function(){
+swipeTarget.addEventListener('touchcancel',function(){
   hideBgOverlay(); swiping=false;
   var card=cards[cur]; if(card){card.style.transition='';card.style.transform='';}
 },{passive:true});
+
+// PC ナビ矢印
+var navPrev=document.getElementById('nav-prev');
+var navNext=document.getElementById('nav-next');
+if(navPrev) navPrev.addEventListener('click',function(){goTo(cur-1);});
+if(navNext) navNext.addEventListener('click',function(){goTo(cur+1);});
 
 document.addEventListener('keydown',function(e){
   if(e.key==='ArrowDown'||e.key==='j'||e.key===' '||e.key==='Enter') { e.preventDefault(); goTo(cur+1); }
@@ -1032,18 +1088,37 @@ function renderShelf(){
     bd.innerHTML='<div class="shelf-empty">まだ何も保存していません<br><br>📚ボタンで気になった冒頭を保存</div>';
     return;
   }
-  bd.innerHTML=[...shelf.entries()].map(function(e){
+  var entries=[...shelf.entries()];
+  var unread=entries.filter(function(e){return !e[1].read;});
+  var read=entries.filter(function(e){return e[1].read;});
+  var sorted=unread.concat(read);
+  bd.innerHTML=sorted.map(function(e){
     var id=e[0], item=e[1];
-    return '<div class="s-item" data-id="'+id+'">'+
+    var readCls=item.read?'s-item read':'s-item';
+    return '<div class="'+readCls+'" data-id="'+id+'">'+
+      '<button class="s-check" data-id="'+id+'" title="既読にする">'+
+        (item.read?'✓':'○')+
+      '</button>'+
       '<div class="s-info">'+
-        '<div class="s-ttl">『'+item.title+'』</div>'+
+        '<div class="s-ttl"'+(item.read?' style="opacity:.4"':'')+'>『'+item.title+'』</div>'+
         '<div class="s-auth">'+item.author+'</div>'+
       '</div>'+
       '<span class="s-arrow">›</span>'+
     '</div>';
   }).join('');
   bd.querySelectorAll('.s-item').forEach(function(el){
-    el.addEventListener('click',function(){showReader(el.dataset.id);});
+    el.addEventListener('click',function(ev){
+      if(ev.target.closest('.s-check'))return;
+      showReader(el.dataset.id);
+    });
+  });
+  bd.querySelectorAll('.s-check').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      var id=btn.dataset.id;
+      var item=shelf.get(id);
+      if(item){ item.read=!item.read; renderShelf(); }
+    });
   });
 }
 
@@ -1058,7 +1133,11 @@ document.getElementById('btn-share').addEventListener('click',function(){
   document.getElementById('share-author').textContent=w.author;
   document.getElementById('share-work').textContent='『'+w.title+'』';
   document.getElementById('share-accent-line').style.background='linear-gradient(90deg,'+accent+',transparent)';
+  var commentEl=document.getElementById('share-comment');
+  if(commentEl) commentEl.value='';
   document.getElementById('share-overlay').classList.add('show');
+  // モーダル表示後にtextareaのスクロール問題を防ぐ
+  setTimeout(function(){ if(commentEl) commentEl.blur(); },50);
 });
 document.getElementById('share-close-btn').addEventListener('click',function(){
   document.getElementById('share-overlay').classList.remove('show');
@@ -1082,7 +1161,10 @@ document.getElementById('share-img-btn').addEventListener('click',async function
 });
 document.getElementById('share-x-btn').addEventListener('click',function(){
   var w=list[cur]; if(!w)return;
+  var comment=document.getElementById('share-comment');
+  var commentText=comment&&comment.value.trim()?comment.value.trim()+'\n\n':'';
   var tweetText=
+    commentText+
     w.author+'『'+w.title+'』の冒頭を収集しました。\n\n'+
     '#冒頭収集館 #青空文庫';
   var url='https://boutou-shuushukan.vercel.app';
