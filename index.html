@@ -238,14 +238,14 @@ body::before{
 
 /* ===== HEADER ===== */
 #header-ui{position:absolute;top:0;right:0;z-index:300;display:flex;align-items:center;gap:6px;padding:14px 14px 0;}
-#btn-filter,#btn-guide{
+#btn-filter,#btn-shelf-open{
   width:36px;height:36px;
   background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
   border-radius:50%;color:rgba(255,255,255,.55);font-size:15px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .2s;touch-action:manipulation;
 }
-#btn-filter:active,#btn-guide:active{background:rgba(255,255,255,.12);}
+#btn-filter:active,#btn-shelf-open:active{background:rgba(255,255,255,.12);}
 
 #card-counter{
   position:absolute;top:18px;left:50%;transform:translateX(-50%);
@@ -516,11 +516,10 @@ body::before{
 <button class="pc-nav" id="nav-prev" aria-label="前へ">↑</button>
 <button class="pc-nav" id="nav-next" aria-label="次へ">↓</button>
 
-<!-- ヘッダー右上 -->
+<!-- ヘッダー右上：📚と≡の2つだけ -->
 <div id="header-ui">
-  <button id="btn-guide" aria-label="使い方" title="使い方">?</button>
   <button id="btn-shelf-open" aria-label="書棚を開く" title="書棚" style="position:relative;">📚<span id="shelf-header-badge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;background:#c4621a;border-radius:8px;font-size:9px;color:#fff;align-items:center;justify-content:center;font-family:sans-serif;padding:0 3px;"></span></button>
-  <button id="btn-filter" aria-label="ジャンル">≡</button>
+  <button id="btn-filter" aria-label="メニュー">≡</button>
 </div>
 
 <!-- カウンター中央上 -->
@@ -571,6 +570,14 @@ body::before{
     <!-- 作家一覧 -->
     <div class="filter-label" style="margin-top:20px;">AUTHORS</div>
     <div id="author-list" style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px;"></div>
+    <!-- 使い方（フィルターパネル内に統合） -->
+    <div class="filter-label" style="margin-top:20px;">HOW TO USE</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.28);letter-spacing:1px;line-height:2.2;padding-bottom:8px;">
+      <div>↑↓ スワイプ / ホイール / キーで切替</div>
+      <div>❤️ ハートで書棚に保存</div>
+      <div>📚 書棚で保存作品を確認</div>
+      <div>シェア で冒頭を画像・Xに投稿</div>
+    </div>
     <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="filter-note-link">
       <div class="filter-note-inner">CREATED BY<span>@memetomamoru</span>note.com/memetomamoru</div>
     </a>
@@ -635,14 +642,14 @@ body::before{
   </div>
 </div>
 
-<!-- 使い方ガイド -->
+<!-- 使い方ガイド（初回のみ） -->
 <div id="guide-overlay">
-  <div class="guide-title">HOW TO USE</div>
+  <div class="guide-title">冒頭収集館へようこそ</div>
   <div class="guide-items">
-    <div class="guide-item"><div class="guide-arrow">↑↓</div><div class="guide-desc"><strong>スワイプ / キー / スクロールで切り替え</strong>上下スワイプ・↑↓キー・マウスホイール・Spaceで次の作品へ</div></div>
-    <div class="guide-item"><div class="guide-arrow">📚</div><div class="guide-desc"><strong>書棚に保存</strong>📚ボタンで今の作品を保存。いつでも読み返せる</div></div>
-    <div class="guide-item"><div class="guide-arrow">↑</div><div class="guide-desc"><strong>シェア</strong>↑ボタンで冒頭をXに投稿したり画像として保存できる</div></div>
-    <div class="guide-item"><div class="guide-arrow">≡</div><div class="guide-desc"><strong>ジャンルで絞り込み</strong>右上メニューでジャンルを選択</div></div>
+    <div class="guide-item"><div class="guide-arrow">↑↓</div><div class="guide-desc"><strong>スワイプ / ホイール / キーで切替</strong>上下スワイプ・↑↓キー・マウスホイール・Spaceで次の冒頭へ</div></div>
+    <div class="guide-item"><div class="guide-arrow">❤</div><div class="guide-desc"><strong>ハートで書棚に保存</strong>気になった冒頭をタップして保存。もう一度タップで解除</div></div>
+    <div class="guide-item"><div class="guide-arrow">📚</div><div class="guide-desc"><strong>書棚で保存作品を確認</strong>右上の📚から保存した冒頭をいつでも読み返せる</div></div>
+    <div class="guide-item"><div class="guide-arrow">≡</div><div class="guide-desc"><strong>メニューでジャンル・作家を絞込</strong>右上の≡から今日の冒頭・ジャンル・作家で絞り込み</div></div>
   </div>
   <button class="guide-close" id="guide-close">は じ め る</button>
   <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="guide-note-link">制作者のnote → note.com/memetomamoru</a>
@@ -1233,14 +1240,11 @@ document.getElementById('share-x-btn').addEventListener('click',function(){
   document.getElementById('share-overlay').classList.remove('show');
 });
 
-// ===== 使い方ガイド =====
+// ===== 使い方ガイド（初回のみ自動表示） =====
 var GUIDE_KEY='boutou_guide_v1';
 document.getElementById('guide-close').addEventListener('click',function(){
   document.getElementById('guide-overlay').classList.remove('show');
   localStorage.setItem(GUIDE_KEY,'done');
-});
-document.getElementById('btn-guide').addEventListener('click',function(){
-  document.getElementById('guide-overlay').classList.add('show');
 });
 
 // ===== 初期化 =====
