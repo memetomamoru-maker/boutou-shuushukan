@@ -1643,6 +1643,14 @@ document.getElementById('btn-share').addEventListener('click',function(){
   if(commentEl) { commentEl.value=''; commentEl.disabled=false; }
   document.getElementById('share-overlay').classList.add('show');
 });
+// share-comment textarea のタッチ伝播を止める
+var shareComment=document.getElementById('share-comment');
+if(shareComment){
+  ['touchstart','touchmove','touchend','touchcancel'].forEach(function(ev){
+    shareComment.addEventListener(ev,function(e){ e.stopPropagation(); },{passive:true});
+  });
+}
+
 document.getElementById('share-close-btn').addEventListener('click',function(){
   document.getElementById('share-overlay').classList.remove('show');
   var c=document.getElementById('share-comment'); if(c){c.value='';c.disabled=false;}
