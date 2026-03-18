@@ -1129,7 +1129,7 @@ function cleanText(raw){
   // 先頭のダッシュ・記号を除去（「―むっつり…」のようなケース）
   body = body.replace(/^[―─━\-＝＊※◎○●◆◇■□▲▽▼\s　]+/, '').trim();
 
-  const MAX = 190;
+  const MAX = 250;
   let result = '';
   let pos = 0;
 
@@ -1172,6 +1172,19 @@ function cleanText(raw){
     const last = result.lastIndexOf('。');
     if(last > 10) result = result.slice(0, last + 1);
   }
+
+  // 短い前置き文（20文字以下）だけの場合は次の文も追加
+  if(result.length <= 20 && result.endsWith('。')){
+    var rest = body.slice(result.length);
+    var nextKuten = rest.indexOf('。');
+    if(nextKuten !== -1){
+      var nextSent = rest.slice(0, nextKuten + 1);
+      if(result.length + nextSent.length <= MAX) result = result + nextSent;
+    }
+  }
+
+  // 結果内の改行を除去して整形
+  result = result.replace(/\n+/g, ' ').trim();
 
   return result;
 }
