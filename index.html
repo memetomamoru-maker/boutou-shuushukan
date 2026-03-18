@@ -167,17 +167,11 @@ body::before{
 
 .card-text{
   writing-mode:vertical-rl;text-orientation:mixed;
-  font-family:'Zen Old Mincho','Shippori Mincho',serif;
+  font-family:'Shippori Mincho','Zen Old Mincho',serif;
   font-size:clamp(17px,4.5vw,22px);line-height:2.1;letter-spacing:.15em;
   color:rgba(240,228,210,.88);height:auto;overflow:visible;
-  font-feature-settings:"vkna" 1,"vert" 1;
-  text-combine-upright:none;
-  -webkit-font-feature-settings:"vkna" 1,"vert" 1;
 }
-.card-text .punct{
-  display:inline-block;
-  transform:translate(0.4em, -0.1em);
-}
+
 
 /* ===== ACTION BAR ===== */
 #action-bar{
@@ -1214,7 +1208,7 @@ let cards = [];
 
 function setCardText(el, text){
   const w = el.querySelector('.card-text');
-  if(w){ var html=text.replace(/[。、！？]/g,'<span class="punct">$&</span>'); w.innerHTML=html; w.classList.remove('card-loading-txt'); w.style.animation='none'; w.style.color=''; }
+  if(w){ w.textContent=text; w.classList.remove('card-loading-txt'); w.style.animation='none'; w.style.color=''; }
   el.classList.remove('is-loading');
 }
 function setCardError(el){
