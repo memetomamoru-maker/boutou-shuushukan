@@ -108,7 +108,6 @@ body::before{
 .card[data-g="探偵・推理"] .card-bg{background:linear-gradient(160deg,#0d1520 0%,#102035 40%,#0d1520 100%);}
 .card[data-g="怪談・怪異"] .card-bg{background:linear-gradient(160deg,#120d1a 0%,#1e1228 40%,#120d1a 100%);}
 .card[data-g="恋愛・情念"] .card-bg{background:linear-gradient(160deg,#1a0d10 0%,#2a1018 40%,#1a0d10 100%);}
-.card[data-g="歴史・時代"] .card-bg{background:linear-gradient(160deg,#160f08 0%,#261808 40%,#160f08 100%);}
 .card[data-g="幻想・耽美"] .card-bg{background:linear-gradient(160deg,#0d1a14 0%,#102614 40%,#0d1a14 100%);}
 .card[data-g="社会・風俗"] .card-bg{background:linear-gradient(160deg,#101614 0%,#152018 40%,#101614 100%);}
 
@@ -123,7 +122,6 @@ body::before{
 .card[data-g="探偵・推理"] .card-accent{background:linear-gradient(90deg,#2a6090,#4a9cc8,transparent);}
 .card[data-g="怪談・怪異"] .card-accent{background:linear-gradient(90deg,#6a2090,#a050d0,transparent);}
 .card[data-g="恋愛・情念"] .card-accent{background:linear-gradient(90deg,#902040,#d04070,transparent);}
-.card[data-g="歴史・時代"] .card-accent{background:linear-gradient(90deg,#8a5010,#c88030,transparent);}
 .card[data-g="幻想・耽美"] .card-accent{background:linear-gradient(90deg,#1a7a40,#30b060,transparent);}
 .card[data-g="社会・風俗"] .card-accent{background:linear-gradient(90deg,#2a6a40,#40a060,transparent);}
 
@@ -138,7 +136,6 @@ body::before{
 .card[data-g="探偵・推理"] .genre-badge{color:#4a9cc8;}
 .card[data-g="怪談・怪異"] .genre-badge{color:#a050d0;}
 .card[data-g="恋愛・情念"] .genre-badge{color:#d04070;}
-.card[data-g="歴史・時代"] .genre-badge{color:#c88030;}
 .card[data-g="幻想・耽美"] .genre-badge{color:#30b060;}
 .card[data-g="社会・風俗"] .genre-badge{color:#40a060;}
 
@@ -449,9 +446,6 @@ body::before{
 #app[data-genre="恋愛・情念"] #grad-bg::after     { background: radial-gradient(ellipse, #4a0818 0%, transparent 65%); }
 #app[data-genre="恋愛・情念"] #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #b03060 0%, transparent 65%); }
 
-#app[data-genre="歴史・時代"] #grad-bg::before    { background: radial-gradient(ellipse, #7a4008 0%, transparent 65%); }
-#app[data-genre="歴史・時代"] #grad-bg::after     { background: radial-gradient(ellipse, #4a2806 0%, transparent 65%); }
-#app[data-genre="歴史・時代"] #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #a86820 0%, transparent 65%); }
 
 #app[data-genre="幻想・耽美"] #grad-bg::before    { background: radial-gradient(ellipse, #085820 0%, transparent 65%); }
 #app[data-genre="幻想・耽美"] #grad-bg::after     { background: radial-gradient(ellipse, #043a14 0%, transparent 65%); }
@@ -468,7 +462,6 @@ body::before{
 #app[data-genre="探偵・推理"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,96,160,.35) 0%,transparent 65%);}
 #app[data-genre="怪談・怪異"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(120,32,160,.35) 0%,transparent 65%);}
 #app[data-genre="恋愛・情念"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(160,32,64,.35) 0%,transparent 65%);}
-#app[data-genre="歴史・時代"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(140,80,16,.35) 0%,transparent 65%);}
 #app[data-genre="幻想・耽美"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(26,130,64,.35) 0%,transparent 65%);}
 #app[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,110,64,.35) 0%,transparent 65%);}
 
@@ -962,7 +955,6 @@ body::before{
       <button class="f-item" data-f="探偵・推理">探偵・推理</button>
       <button class="f-item" data-f="怪談・怪異">怪談・怪異</button>
       <button class="f-item" data-f="恋愛・情念">恋愛・情念</button>
-      <button class="f-item" data-f="歴史・時代">歴史・時代</button>
       <button class="f-item" data-f="幻想・耽美">幻想・耽美</button>
       <button class="f-item" data-f="社会・風俗">社会・風俗</button>
       <div class="filter-label">AUTHORS</div>
@@ -1108,16 +1100,13 @@ const AUTHOR_GENRE = {
   '小酒井不木':'探偵・推理','浜尾四郎':'探偵・推理','海野十三':'探偵・推理',
   // 怪談・怪異
   '田中貢太郎':'怪談・怪異','岡本綺堂':'怪談・怪異',
-  // 歴史・時代
-  '吉川英治':'歴史・時代','山本周五郎':'歴史・時代','菊池寛':'歴史・時代',
-  '佐々木味津三':'歴史・時代',
   // 社会・風俗
   '宮本百合子':'社会・風俗','尾崎士郎':'社会・風俗',
 };
 
 const GENRE_ACCENT = {
   '純文学':'#e8a04a','探偵・推理':'#4a9cc8','怪談・怪異':'#a050d0',
-  '恋愛・情念':'#d04070','歴史・時代':'#c88030','幻想・耽美':'#30b060','社会・風俗':'#40a060'
+  '恋愛・情念':'#d04070','幻想・耽美':'#30b060','社会・風俗':'#40a060'
 };
 
 function cleanText(raw){
