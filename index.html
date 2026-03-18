@@ -4,15 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>冒頭収集館 — 名作の書き出しを、毎日ひとつ。</title>
-<meta name="description" content="芥川・漱石・太宰など500作品の冒頭だけを集めたアプリ。スワイプで次々と名作の書き出しを体験できます。">
-<meta name="theme-color" content="#050403">
+
+<!-- SEO -->
+<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
+<meta name="keywords" content="冒頭,文学,青空文庫,芥川龍之介,夏目漱石,太宰治,江戸川乱歩,読書">
+<meta name="author" content="memetomamoru">
 
 <!-- OGP -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="冒頭収集館">
-<meta property="og:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
-<meta property="og:description" content="芥川・漱石・太宰など500作品の冒頭だけを集めたアプリ。スワイプで次々と名作の書き出しを体験できます。">
 <meta property="og:url" content="https://boutou-shuushukan.vercel.app/">
+<meta property="og:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
+<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
 <meta property="og:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -21,31 +24,9 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@memetomamoru">
-<meta name="twitter:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
-<meta name="twitter:description" content="芥川・漱石・太宰など500作品の冒頭だけを集めたアプリ。スワイプで次々と名作の書き出しを体験できます。">
-<meta name="twitter:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
-
-<!-- SEO -->
-<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
-<meta name="keywords" content="冒頭,文学,青空文庫,芥川龍之介,夏目漱石,太宰治,江戸川乱歩,読書">
-<meta name="author" content="memetomamoru">
-
-<!-- OGP (Facebook / LINE / Slack etc.) -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://boutou-shuushukan.vercel.app/">
-<meta property="og:title" content="冒頭収集館">
-<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
-<meta property="og:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:locale" content="ja_JP">
-<meta property="og:site_name" content="冒頭収集館">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://boutou-shuushukan.vercel.app/">
-<meta name="twitter:title" content="冒頭収集館">
-<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。毎日1作品が「今日の冒頭」として届きます。">
+<meta name="twitter:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
+<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
 <meta name="twitter:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
 
 <!-- PWA / iOS -->
@@ -1473,11 +1454,33 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowUp'  ||e.key==='k'||e.key==='Backspace') { e.preventDefault(); goTo(cur-1); }
 });
 
-// マウスホイール対応（PC）- transitioningフラグで制御
-deck.addEventListener('wheel',function(e){
-  if(transitioning) return;
-  if(e.deltaY > 0) goTo(cur+1);
-  else if(e.deltaY < 0) goTo(cur-1);
+// マウスホイール対応（PC / Magic Mouse / トラックパッド）
+// Magic Mouseは1スワイプで大量のwheelイベントが連続発火するため
+// deltaYを累積して閾値を超えたら1回だけ発火する方式に変更
+var wheelAccum = 0;
+var wheelTimer = null;
+deck.addEventListener('wheel', function(e){
+  // トラックパッド判定：deltaMode===0 かつ deltaY が小数を含む場合はトラックパッド
+  // Magic Mouseも同様のイベントを出すため同じ処理
+  wheelAccum += e.deltaY;
+  clearTimeout(wheelTimer);
+  // 累積が閾値（100）を超えたら即発火
+  if(Math.abs(wheelAccum) >= 100){
+    if(!transitioning){
+      if(wheelAccum > 0) goTo(cur+1);
+      else goTo(cur-1);
+    }
+    wheelAccum = 0;
+  } else {
+    // 閾値未満でも200ms後に発火（ゆっくりスワイプ対応）
+    wheelTimer = setTimeout(function(){
+      if(!transitioning && Math.abs(wheelAccum) > 20){
+        if(wheelAccum > 0) goTo(cur+1);
+        else goTo(cur-1);
+      }
+      wheelAccum = 0;
+    }, 200);
+  }
 },{passive:true});
 
 // ===== ❤️ハートボタン：保存トグル =====
@@ -1653,7 +1656,13 @@ document.getElementById('share-img-btn').addEventListener('click',async function
     link.href=canvas.toDataURL('image/png');
     link.click();
   }catch(e){
-    alert('保存に失敗しました。スクリーンショットをご利用ください。');
+    var toast=document.getElementById('saved-toast');
+    if(toast){
+      toast.textContent='画像保存に失敗しました';
+      toast.classList.remove('show'); void toast.offsetWidth;
+      toast.classList.add('show');
+      toast.addEventListener('animationend',function(){toast.classList.remove('show');},{once:true});
+    }
   }finally{
     btn.textContent='画像保存'; btn.disabled=false;
     document.getElementById('share-overlay').classList.remove('show');
