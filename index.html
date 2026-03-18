@@ -240,13 +240,15 @@ body::before{
   align-items:center;gap:12px;
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
-  animation:bannerUp .4s cubic-bezier(.76,0,.24,1) forwards;
 }
 @keyframes bannerUp{
   from{transform:translateY(16px);opacity:0;}
   to{transform:translateY(0);opacity:1;}
 }
-#pwa-banner.show{display:flex;}
+#pwa-banner.show{
+  display:flex;
+  animation:bannerUp .4s cubic-bezier(.76,0,.24,1) forwards;
+}
 .pwa-icon{font-size:22px;flex-shrink:0;}
 .pwa-text{flex:1;min-width:0;}
 .pwa-text strong{display:block;font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.8);margin-bottom:2px;}
@@ -1284,28 +1286,20 @@ document.getElementById('share-x-btn').addEventListener('click',function(){
   document.getElementById('share-overlay').classList.remove('show');
 });
 
-// ===== PWAインストール訴求（SP・3回目以降） =====
+// ===== PWAインストール訴求（SP・初回4秒後） =====
 (function(){
-  // スタンドアロン（インストール済み）なら表示しない
   if(window.matchMedia('(display-mode: standalone)').matches) return;
-  if(navigator.standalone) return; // iOS
-  // PCなら表示しない
+  if(navigator.standalone) return;
   if(window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
 
   var PWA_KEY='boutou_pwa_dismissed';
   if(localStorage.getItem(PWA_KEY)) return;
 
-  // 訪問回数カウント
-  var visits=parseInt(localStorage.getItem('boutou_visits')||'0')+1;
-  localStorage.setItem('boutou_visits', visits);
-
-  // 3回目の訪問で表示
-  if(visits >= 3){
-    setTimeout(function(){
-      var banner=document.getElementById('pwa-banner');
-      if(banner) banner.classList.add('show');
-    }, 3000);
-  }
+  // 初回訪問から4秒後に表示
+  setTimeout(function(){
+    var banner=document.getElementById('pwa-banner');
+    if(banner) banner.classList.add('show');
+  }, 4000);
 
   var closeBtn=document.getElementById('pwa-close');
   if(closeBtn){
