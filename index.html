@@ -157,7 +157,7 @@ body::before{
 /* TEXT AREA */
 .card-text-wrap{
   flex:1;position:relative;z-index:5;
-  display:flex;align-items:flex-start;justify-content:flex-end;
+  display:flex;align-items:flex-start;justify-content:center;
   padding:20px 32px 90px 24px; /* 右32px = 句読点見切れ防止 */
   overflow:hidden;
 }
@@ -1137,7 +1137,10 @@ function cleanText(raw){
   var headingPattern = /^([\s　]*(([一二三四五六七八九十百千〇0-9０-９※◎○●◆◇■□△▲▽▼\-―─━＊\*]{1,6}|第[^\n]{1,20})[\s　]*\n+|[^\n。、]{1,6}\n+))+/;
   body = body.replace(headingPattern, '').trim();
 
-  const MAX = 190, MIN = 30;
+  // 先頭のダッシュ・記号を除去（「―むっつり…」のようなケース）
+  body = body.replace(/^[―─━\-＝＊※◎○●◆◇■□▲▽▼\s　]+/, '').trim();
+
+  const MAX = 190, MIN = 15;
   let result = '';
   let pos = 0;
 
