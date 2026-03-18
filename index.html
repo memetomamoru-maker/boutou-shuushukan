@@ -6,7 +6,7 @@
 <title>冒頭収集館 — 名作の書き出しを、毎日ひとつ。</title>
 
 <!-- SEO -->
-<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
+<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。500作品の中から毎日1作品が日替わりで表示されます。">
 <meta name="keywords" content="冒頭,文学,青空文庫,芥川龍之介,夏目漱石,太宰治,江戸川乱歩,読書">
 <meta name="author" content="memetomamoru">
 
@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="冒頭収集館">
 <meta property="og:url" content="https://boutou-shuushukan.vercel.app/">
 <meta property="og:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
-<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
+<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。500作品の中から毎日1作品が日替わりで表示されます。">
 <meta property="og:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -26,7 +26,7 @@
 <meta name="twitter:site" content="@memetomamoru">
 <meta name="twitter:url" content="https://boutou-shuushukan.vercel.app/">
 <meta name="twitter:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
-<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
+<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。500作品の中から毎日1作品が日替わりで表示されます。">
 <meta name="twitter:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
 
 <!-- PWA / iOS -->
@@ -142,7 +142,7 @@ body::before{
 .card[data-g="幻想・耽美"] .genre-badge{color:#30b060;}
 .card[data-g="社会・風俗"] .genre-badge{color:#40a060;}
 
-/* 今日の冒頭バッジ：ジャンルバッジの下に独立した行で */
+/* 日替わり冒頭バッジ：ジャンルバッジの下に独立した行で */
 .today-badge{
   font-family:'IM Fell English',serif;font-style:italic;
   font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.4);
@@ -525,7 +525,7 @@ body::before{
   content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
   width:4px;height:16px;background:currentColor;opacity:.5;
 }
-/* 今日の冒頭は特別カラー */
+/* 日替わり冒頭は特別カラー */
 #f-today{color:rgba(240,160,74,.5);}
 #f-today.on{color:rgba(240,160,74,.9);}
 
@@ -771,29 +771,28 @@ body::before{
 
 /* はじめるボタン */
 .guide-close{
-  background:none;
-  border:none;
-  border-top:1px solid rgba(255,255,255,.12);
-  border-bottom:1px solid rgba(255,255,255,.12);
-  color:rgba(240,228,210,.5);
+  background:rgba(240,228,210,.1);
+  border:1px solid rgba(240,228,210,.3);
+  color:rgba(240,228,210,.9);
   font-family:'Shippori Mincho',serif;
-  font-size:11px;letter-spacing:7px;
-  padding:14px 48px;cursor:pointer;
+  font-size:13px;letter-spacing:6px;
+  padding:16px 56px;cursor:pointer;
   touch-action:manipulation;
-  transition:all .3s;
+  transition:all .25s;
   position:relative;
+  margin-top:4px;
 }
 .guide-close::before,.guide-close::after{
   content:'';position:absolute;top:50%;
-  width:20px;height:1px;
-  background:rgba(255,255,255,.15);
-  transition:width .3s;
+  width:16px;height:1px;
+  background:rgba(240,228,210,.3);
 }
-.guide-close::before{right:calc(100% + 8px);transform:translateY(-50%);}
-.guide-close::after{left:calc(100% + 8px);transform:translateY(-50%);}
+.guide-close::before{right:calc(100% + 10px);transform:translateY(-50%);}
+.guide-close::after{left:calc(100% + 10px);transform:translateY(-50%);}
 .guide-close:active{
-  color:rgba(240,228,210,.9);
-  border-color:rgba(255,255,255,.25);
+  background:rgba(240,228,210,.18);
+  border-color:rgba(240,228,210,.5);
+  color:#fff;
 }
 
 .guide-note-link{
@@ -945,7 +944,7 @@ body::before{
     </div>
     <div id="filter-scroll">
       <div class="filter-label">GENRE <span id="filter-count"></span></div>
-      <button class="f-item" data-f="today" id="f-today">今日の冒頭</button>
+      <button class="f-item" data-f="today" id="f-today">日替わり冒頭</button>
       <button class="f-item on" data-f="all">すべて</button>
       <button class="f-item" data-f="純文学">純文学</button>
       <button class="f-item" data-f="探偵・推理">探偵・推理</button>
@@ -1063,7 +1062,7 @@ body::before{
     </div>
     <div class="guide-item">
       <div class="guide-arrow">≡</div>
-      <div class="guide-desc"><strong>メニューでジャンル・作家を絞込</strong>今日の冒頭、ジャンル、作家名で絞り込み可能</div>
+      <div class="guide-desc"><strong>メニューでジャンル・作家を絞込</strong>日替わり冒頭、ジャンル、作家名で絞り込み可能</div>
     </div>
   </div>
   <button class="guide-close" id="guide-close">は じ め る</button>
@@ -1222,7 +1221,7 @@ function buildCard(w, idx){
   return el;
 }
 
-// ===== 今日の冒頭：日付シードで決定 =====
+// ===== 日替わり冒頭：日付シードで決定 =====
 function getTodayIndex(len){
   if(!len) return 0;
   var d=new Date();
@@ -1245,10 +1244,10 @@ function build(){
     var el = buildCard(w,i);
     if(i===0){
       el.classList.add('is-current');
-      // 「今日の冒頭」バッジをジャンルバッジの下に追加
+      // 「日替わり冒頭」バッジをジャンルバッジの下に追加
       var badge=document.createElement('div');
       badge.className='today-badge';
-      badge.textContent='今日の冒頭';
+      badge.textContent='日替わり冒頭';
       // 日付を card-top-row の右端に追加
       var d=new Date();
       var month=d.getMonth()+1;
@@ -1521,7 +1520,7 @@ function applyFilter(){
   var fc=document.getElementById('filter-count');
   if(fc) fc.textContent='— '+list.length+'作品';
   build();
-  // 「今日の冒頭」フィルターの場合は先頭1枚だけ
+  // 「日替わり冒頭」フィルターの場合は先頭1枚だけ
   if(filterVal==='today'){
     list=[list[0]];
     build();
