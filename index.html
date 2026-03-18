@@ -3,7 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>冒頭収集館</title>
+<title>冒頭収集館 — 名作の書き出しを、毎日ひとつ。</title>
+<meta name="description" content="芥川・漱石・太宰など500作品の冒頭だけを集めたアプリ。スワイプで次々と名作の書き出しを体験できます。">
+<meta name="theme-color" content="#050403">
+
+<!-- OGP -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="冒頭収集館">
+<meta property="og:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
+<meta property="og:description" content="芥川・漱石・太宰など500作品の冒頭だけを集めたアプリ。スワイプで次々と名作の書き出しを体験できます。">
+<meta property="og:url" content="https://boutou-shuushukan.vercel.app/">
+<meta property="og:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@memetomamoru">
+<meta name="twitter:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
+<meta name="twitter:description" content="芥川・漱石・太宰など500作品の冒頭だけを集めたアプリ。スワイプで次々と名作の書き出しを体験できます。">
+<meta name="twitter:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
+
+<!-- SEO -->
+<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
+<meta name="keywords" content="冒頭,文学,青空文庫,芥川龍之介,夏目漱石,太宰治,江戸川乱歩,読書">
+<meta name="author" content="memetomamoru">
+
+<!-- OGP (Facebook / LINE / Slack etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://boutou-shuushukan.vercel.app/">
+<meta property="og:title" content="冒頭収集館">
+<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上。毎日1作品が「今日の冒頭」として届きます。">
+<meta property="og:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="冒頭収集館">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://boutou-shuushukan.vercel.app/">
+<meta name="twitter:title" content="冒頭収集館">
+<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。毎日1作品が「今日の冒頭」として届きます。">
+<meta name="twitter:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
+
+<!-- PWA / iOS -->
+<meta name="theme-color" content="#050403">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="冒頭収集館">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
@@ -274,6 +323,27 @@ body::before{
 @media (hover:hover) and (pointer:fine){
   #pwa-banner{display:none!important;}
 }
+
+/* ===== 小画面対応（iPhone SE: 375px以下） ===== */
+@media (max-width: 375px){
+  .action-author{font-size:12px;letter-spacing:1px;}
+  .action-title{font-size:9px;}
+  .action-btn{font-size:10px;padding:6px 10px;}
+  .action-icon-btn{width:36px;height:36px;min-width:36px;}
+  #btn-share{font-size:10px;padding:0 10px;height:36px;}
+  .card-top{padding:10px 14px 0;}
+  .genre-badge{font-size:10px;padding:2px 8px;}
+  .today-badge{font-size:8px;}
+  .today-date{font-size:10px;}
+  .card-text{font-size:clamp(15px,4vw,18px);}
+  .card-text-wrap{padding:16px 16px 80px;}
+  #header-ui{padding:10px 10px 0;}
+  #btn-filter,#btn-shelf-open{width:32px;height:32px;font-size:13px;}
+  .guide-title{font-size:21px;}
+  .guide-items{margin-bottom:24px;}
+  .guide-item{padding:11px 4px;}
+}
+
 .pc-nav{
   display:none;
   position:absolute;bottom:80px;z-index:350;
@@ -763,7 +833,38 @@ body::before{
   color:rgba(255,255,255,.14);text-decoration:none;
 }
 
-/* ===== シェアモーダル ===== */
+/* ===== iPhone SE など小画面対応 (〜375px) ===== */
+@media (max-width: 375px){
+  /* アクションバーをコンパクトに */
+  .action-bar-inner{padding:6px 10px 14px;gap:6px;}
+  .action-author{font-size:12px;}
+  .action-btn{font-size:9px;padding:6px 9px;}
+  .action-icon-btn{width:36px;height:36px;min-width:36px;}
+  #btn-heart svg{width:17px;height:17px;}
+
+  /* カードテキストを少し小さく */
+  .card-text{font-size:clamp(15px,4vw,18px);}
+
+  /* ヘッダーボタン */
+  #btn-filter,#btn-shelf-open{width:32px;height:32px;font-size:13px;}
+  #header-ui{gap:4px;padding:12px 10px 0;}
+
+  /* ガイドのパディング */
+  #guide-overlay{padding:0 24px;}
+  .guide-title{font-size:20px;}
+  .guide-items{margin-bottom:24px;}
+  .guide-item{padding:11px 4px;gap:14px;}
+  .guide-desc{font-size:11px;}
+  .guide-desc strong{font-size:12px;}
+
+  /* 書棚ヘッダー */
+  .shelf-ttl{font-size:16px;}
+  .shelf-hd{padding:44px 20px 16px;}
+
+  /* フィルターパネル */
+  #filter-panel-hd{padding:44px 20px 16px;}
+  #filter-scroll{padding:16px 20px 32px;}
+}
 #share-overlay{
   position:absolute;inset:0;z-index:700;
   display:none;flex-direction:column;align-items:center;justify-content:center;
@@ -1049,31 +1150,43 @@ function cleanText(raw){
     .replace(/\r\n/g,'\n').replace(/\r/g,'\n')
     .replace(/\n{3,}/g,'\n\n').trim();
 
-  // 必ず句点で終わる。60〜190文字の範囲で最後の句点を探す
   const MAX = 190, MIN = 55;
   let result = '';
   let pos = 0;
+
   while(pos < body.length){
     const kuten = body.indexOf('。', pos);
     if(kuten === -1) break;
     const candidate = body.slice(0, kuten + 1);
-    if(candidate.length >= MIN){
-      result = candidate;
-    }
+    // MINに達した時点でresultを更新、MAX超えたら即終了
+    if(candidate.length >= MIN) result = candidate;
     if(candidate.length >= MAX) break;
     pos = kuten + 1;
   }
-  // フォールバック：どうしても見つからない場合も句点で終わらせる
+
+  // ① 句点が見つからない or MINに届かなかった場合
+  //    → 最初の句点まで（なければMAXで切る）
   if(!result){
-    const cut = body.slice(0, MAX);
-    const last = cut.lastIndexOf('。');
-    result = last > 10 ? cut.slice(0, last + 1) : cut;
+    const firstKuten = body.indexOf('。');
+    if(firstKuten !== -1){
+      // 第1文が長い場合はMAXで強制カット
+      result = body.slice(0, Math.min(firstKuten + 1, MAX + 20));
+    } else {
+      // 句点が全くない → 読点か改行か文字数で切る
+      const cut = body.slice(0, MAX);
+      const touten = cut.lastIndexOf('、');
+      const newline = cut.lastIndexOf('\n');
+      const boundary = Math.max(touten, newline);
+      result = boundary > 20 ? cut.slice(0, boundary + 1) : cut;
+    }
   }
-  // 末尾が句点以外なら直前の句点まで切り詰める（最終保険）
+
+  // ② 末尾が句点でなければ直前の句点まで切り詰め（最終保険）
   if(result && !result.endsWith('。')){
     const last = result.lastIndexOf('。');
     if(last > 10) result = result.slice(0, last + 1);
   }
+
   return result;
 }
 
