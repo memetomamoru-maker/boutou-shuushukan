@@ -172,15 +172,15 @@ body::before{
   content:'';display:inline-block;width:20px;height:1px;
   background:rgba(255,255,255,.25);
 }
-/* 日付：card-top右端に横並び（テキストエリア外） */
+/* 日付：カード右下・アクションバーのすぐ上 */
 .today-date{
-  margin-left:auto;
+  position:absolute;
+  bottom:96px;right:20px;
+  z-index:10;pointer-events:none;
   font-family:'IM Fell English',serif;font-style:italic;
-  font-size:11px;letter-spacing:2px;
-  color:rgba(255,255,255,.22);
-  white-space:nowrap;
-  align-self:flex-end;
-  padding-bottom:1px;
+  font-size:11px;letter-spacing:3px;
+  color:rgba(255,255,255,.18);
+  writing-mode:horizontal-tb;
 }
 
 /* TEXT AREA */
@@ -1286,8 +1286,8 @@ function build(){
       var dateEl=document.createElement('div');
       dateEl.className='today-date';
       dateEl.textContent=month+'.'+day;
+      el.appendChild(dateEl);
       var topRow=el.querySelector('.card-top-row');
-      if(topRow) topRow.appendChild(dateEl);
       el.querySelector('.card-top').appendChild(badge);
     }
     deck.appendChild(el);
