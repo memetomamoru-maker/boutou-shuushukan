@@ -850,16 +850,18 @@ body::before{
 #share-overlay.show{display:flex;}
 #share-card{
   background:#0e0c0a;width:100%;max-width:340px;
-  padding:28px 36px 24px 24px;border:1px solid rgba(255,255,255,.08);
+  padding:28px 48px 24px 24px;border:1px solid rgba(255,255,255,.08);
+  overflow:hidden;
 }
 .share-accent-line{height:1px;margin-bottom:20px;}
 .share-first-sentence{
   writing-mode:vertical-rl;font-family:'Shippori Mincho','Zen Old Mincho',serif;
   font-size:18px;line-height:2.0;letter-spacing:.12em;
   color:rgba(240,228,210,.95);
-  max-height:220px;overflow:hidden;
+  max-height:220px;overflow:visible;
   align-self:flex-end;display:block;margin:0 auto 20px;
   text-orientation:mixed;
+  padding-right:8px;
 }
 .share-meta-row{display:flex;justify-content:space-between;align-items:flex-end;}
 .share-author-block{}
@@ -1675,7 +1677,10 @@ document.getElementById('share-img-btn').addEventListener('click',async function
   var btn=this; btn.textContent='生成中…'; btn.disabled=true;
   try{
     var card=document.getElementById('share-card');
+    var origOverflow=card.style.overflow;
+    card.style.overflow='visible';
     var canvas=await html2canvas(card,{backgroundColor:'#0e0c0a',scale:window.devicePixelRatio||1,useCORS:true,logging:false});
+    card.style.overflow=origOverflow;
     var w=list[cur];
     var link=document.createElement('a');
     link.download='boutou_'+(w?w.author:'unknown')+'.png';
