@@ -613,14 +613,6 @@ body::before{
   transition:background .15s;
 }
 .s-item:active{background:rgba(255,255,255,.02);}
-.s-check{
-  flex-shrink:0;width:26px;height:26px;background:none;
-  border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.2);
-  font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  touch-action:manipulation;transition:all .15s;border-radius:50%;
-}
-.s-item.read .s-check{border-color:rgba(196,98,26,.4);color:rgba(240,160,74,.6);}
-.s-check:active{background:rgba(255,255,255,.06);}
 .s-info{flex:1;min-width:0;}
 .s-ttl{
   font-family:'Shippori Mincho',serif;
@@ -632,7 +624,6 @@ body::before{
   font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1px;
 }
 .s-arrow{color:rgba(255,255,255,.12);font-size:12px;flex-shrink:0;}
-.s-item.read .s-ttl{opacity:.35;}
 
 /* リーダー */
 .reader-hd{
@@ -1633,18 +1624,11 @@ function renderShelf(){
     return;
   }
   var entries=[...shelf.entries()];
-  var unread=entries.filter(function(e){return !e[1].read;});
-  var read=entries.filter(function(e){return e[1].read;});
-  var sorted=unread.concat(read);
-  bd.innerHTML=sorted.map(function(e){
+  bd.innerHTML=entries.map(function(e){
     var id=e[0], item=e[1];
-    var readCls=item.read?'s-item read':'s-item';
-    return '<div class="'+readCls+'" data-id="'+id+'">'+
-      '<button class="s-check" data-id="'+id+'" title="既読にする">'+
-        (item.read?'✓':'○')+
-      '</button>'+
+    return '<div class="s-item" data-id="'+id+'">'+
       '<div class="s-info">'+
-        '<div class="s-ttl"'+(item.read?' style="opacity:.4"':'')+'>『'+item.title+'』</div>'+
+        '<div class="s-ttl">『'+item.title+'』</div>'+
         '<div class="s-auth">'+item.author+'</div>'+
       '</div>'+
       '<span class="s-arrow">›</span>'+
@@ -1652,17 +1636,9 @@ function renderShelf(){
   }).join('');
   bd.querySelectorAll('.s-item').forEach(function(el){
     el.addEventListener('click',function(ev){
-      if(ev.target.closest('.s-check'))return;
       showReader(el.dataset.id);
     });
   });
-  bd.querySelectorAll('.s-check').forEach(function(btn){
-    btn.addEventListener('click',function(e){
-      e.stopPropagation();
-      var id=btn.dataset.id;
-      var item=shelf.get(id);
-      if(item){ item.read=!item.read; renderShelf(); }
-    });
   });
 }
 
