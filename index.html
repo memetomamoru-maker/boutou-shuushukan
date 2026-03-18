@@ -231,29 +231,46 @@ body::before{
 
 /* ===== PWAインストール訴求バナー（SP限定） ===== */
 #pwa-banner{
-  position:absolute;bottom:72px;left:12px;right:12px;
+  position:absolute;bottom:76px;left:14px;right:14px;
   z-index:600;
-  background:rgba(10,8,6,.92);
-  border:1px solid rgba(255,255,255,.12);
-  padding:12px 14px;
+  background:linear-gradient(135deg,#0e0b08 0%,#0a0907 100%);
+  border:1px solid rgba(255,255,255,.1);
+  border-left:2px solid rgba(240,160,74,.3);
+  padding:14px 16px;
   display:none;
-  align-items:center;gap:12px;
+  align-items:center;gap:14px;
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
 }
 @keyframes bannerUp{
-  from{transform:translateY(16px);opacity:0;}
+  from{transform:translateY(12px);opacity:0;}
   to{transform:translateY(0);opacity:1;}
 }
 #pwa-banner.show{
   display:flex;
   animation:bannerUp .4s cubic-bezier(.76,0,.24,1) forwards;
 }
-.pwa-icon{font-size:22px;flex-shrink:0;}
+.pwa-icon{
+  font-size:18px;flex-shrink:0;opacity:.6;
+}
 .pwa-text{flex:1;min-width:0;}
-.pwa-text strong{display:block;font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.8);margin-bottom:2px;}
-.pwa-text span{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.35);line-height:1.5;}
-.pwa-close{background:none;border:none;color:rgba(255,255,255,.25);font-size:16px;cursor:pointer;padding:4px;flex-shrink:0;touch-action:manipulation;}
+.pwa-text strong{
+  display:block;
+  font-family:'Shippori Mincho',serif;
+  font-size:12px;letter-spacing:2px;
+  color:rgba(240,228,210,.7);margin-bottom:4px;
+}
+.pwa-text span{
+  font-size:10px;letter-spacing:1px;
+  color:rgba(255,255,255,.28);line-height:1.8;
+}
+.pwa-close{
+  background:none;border:none;
+  color:rgba(255,255,255,.2);font-size:14px;
+  cursor:pointer;padding:4px;flex-shrink:0;
+  touch-action:manipulation;transition:color .15s;
+}
+.pwa-close:active{color:rgba(255,255,255,.5);}
 @media (hover:hover) and (pointer:fine){
   #pwa-banner{display:none!important;}
 }
@@ -417,92 +434,334 @@ body::before{
 /* ===== FILTER DRAWER ===== */
 #filter-drawer{position:absolute;inset:0;z-index:500;pointer-events:none;}
 #filter-drawer.open{pointer-events:all;}
-#filter-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;transition:opacity .3s;}
+#filter-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .3s;}
 #filter-drawer.open #filter-backdrop{opacity:1;}
 #filter-panel{
-  position:absolute;top:0;right:0;bottom:0;width:min(280px,80vw);
-  background:#111;border-left:1px solid rgba(255,255,255,.07);
-  padding:60px 24px 40px;transform:translateX(100%);visibility:hidden;
-  transition:transform .35s var(--ease);display:flex;flex-direction:column;gap:8px;overflow-y:auto;
+  position:absolute;top:0;right:0;bottom:0;width:min(288px,82vw);
+  background:linear-gradient(180deg,#0e0c0a 0%,#0a0908 100%);
+  border-left:1px solid rgba(255,255,255,.06);
+  padding:0;transform:translateX(100%);visibility:hidden;
+  transition:transform .38s var(--ease);display:flex;flex-direction:column;overflow:hidden;
 }
 #filter-drawer.open #filter-panel{transform:translateX(0);visibility:visible;}
-.filter-label{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.3);margin-bottom:10px;}
-.f-item{
-  background:none;border:none;border-bottom:1px solid rgba(255,255,255,.05);
-  color:rgba(255,255,255,.35);font-family:'Shippori Mincho',serif;
-  font-size:14px;padding:12px 0;cursor:pointer;text-align:left;
-  letter-spacing:2px;transition:color .18s;touch-action:manipulation;
+
+/* パネルヘッダー */
+#filter-panel-hd{
+  padding:52px 24px 20px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  flex-shrink:0;position:relative;
 }
-.f-item:active,.f-item.on{color:rgba(255,255,255,.85);}
-.f-item.on::before{content:'— ';color:rgba(255,255,255,.3);}
-.filter-note-link{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.05);text-decoration:none;display:block;}
+#filter-panel-hd::after{
+  content:'';position:absolute;bottom:0;left:24px;right:24px;height:1px;
+  background:linear-gradient(90deg,rgba(255,255,255,.08),transparent);
+}
+#filter-panel-hd-title{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;letter-spacing:4px;color:rgba(255,255,255,.2);
+}
+
+/* スクロールエリア */
+#filter-scroll{flex:1;overflow-y:auto;padding:20px 24px 40px;display:flex;flex-direction:column;gap:0;}
+
+.filter-label{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:9px;letter-spacing:4px;color:rgba(255,255,255,.2);
+  margin:20px 0 8px;padding-bottom:6px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.filter-label:first-child{margin-top:0;}
+
+.f-item{
+  background:none;border:none;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  color:rgba(255,255,255,.32);font-family:'Shippori Mincho',serif;
+  font-size:14px;padding:13px 0 13px 2px;cursor:pointer;text-align:left;
+  letter-spacing:2px;transition:color .18s,padding-left .18s;touch-action:manipulation;
+  position:relative;
+}
+.f-item:active{color:rgba(255,255,255,.7);}
+.f-item.on{color:rgba(255,255,255,.88);padding-left:14px;}
+.f-item.on::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:4px;height:16px;background:currentColor;opacity:.5;
+}
+/* 今日の冒頭は特別カラー */
+#f-today{color:rgba(240,160,74,.5);}
+#f-today.on{color:rgba(240,160,74,.9);}
+
 .author-pill{
   font-family:'Shippori Mincho',serif;font-size:11px;letter-spacing:1px;
-  color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);padding:4px 10px;
+  color:rgba(255,255,255,.3);background:transparent;
+  border:1px solid rgba(255,255,255,.07);padding:5px 11px;
   cursor:pointer;transition:all .15s;touch-action:manipulation;white-space:nowrap;
 }
-.author-pill:active,.author-pill.on{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.08);}
-.filter-note-inner{font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.22);line-height:2;}
-.filter-note-inner span{display:block;font-size:13px;color:rgba(255,255,255,.4);margin:2px 0;}
+.author-pill:active,.author-pill.on{
+  color:rgba(240,228,210,.85);border-color:rgba(255,255,255,.25);
+  background:rgba(255,255,255,.05);
+}
+
+/* HOW TO USE */
+.filter-howto-item{
+  font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1px;
+  line-height:1;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03);
+  display:flex;align-items:center;gap:10px;
+}
+.filter-howto-icon{width:20px;text-align:center;flex-shrink:0;font-size:13px;opacity:.6;}
+
+.filter-note-link{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.05);text-decoration:none;display:block;}
+.filter-note-inner{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.18);line-height:2.2;}
+.filter-note-inner span{display:block;font-size:12px;color:rgba(255,255,255,.32);margin:2px 0;}
 
 /* ===== SHELF DRAWER ===== */
 #shelf-drawer{position:absolute;inset:0;z-index:500;pointer-events:none;}
 #shelf-drawer.open{pointer-events:all;}
 #shelf-panel{
-  position:absolute;inset:0;background:#0d0d0d;
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#0c0a08 0%,#090807 100%);
   transform:translateY(100%);transition:transform .4s var(--ease);
   display:flex;flex-direction:column;overflow:hidden;
 }
 #shelf-drawer.open #shelf-panel{transform:translateY(0);}
-.shelf-hd{padding:52px 24px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;}
-.shelf-ttl{font-size:13px;letter-spacing:3px;color:rgba(255,255,255,.4);}
-.shelf-close{background:none;border:none;color:rgba(255,255,255,.25);font-size:18px;cursor:pointer;touch-action:manipulation;padding:4px;}
+.shelf-hd{
+  padding:52px 24px 18px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  flex-shrink:0;position:relative;
+}
+.shelf-hd::after{
+  content:'';position:absolute;bottom:0;left:24px;right:24px;height:1px;
+  background:linear-gradient(90deg,rgba(255,255,255,.07),transparent);
+}
+.shelf-ttl{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:18px;letter-spacing:3px;color:rgba(240,228,210,.55);
+}
+.shelf-ttl-sub{
+  font-family:'Shippori Mincho',serif;
+  font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.18);
+  margin-top:4px;
+}
+.shelf-close{
+  background:none;border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.2);font-size:12px;
+  width:30px;height:30px;cursor:pointer;
+  touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;letter-spacing:0;
+}
+.shelf-close:active{background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);}
 #shelf-list-view,#shelf-reader-view{flex:1;overflow:hidden;display:flex;flex-direction:column;}
 #shelf-reader-view{display:none;}
-.shelf-bd{overflow-y:auto;padding:8px 24px 40px;flex:1;}
-.shelf-empty{text-align:center;color:rgba(255,255,255,.2);font-size:13px;letter-spacing:1px;padding:52px 0;line-height:2.8;}
-.s-item{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:12px;cursor:pointer;}
+.shelf-bd{overflow-y:auto;padding:4px 24px 48px;flex:1;}
+.shelf-empty{
+  text-align:center;padding:64px 0;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.shelf-empty-icon{font-size:28px;opacity:.2;}
+.shelf-empty-text{
+  font-family:'Shippori Mincho',serif;
+  color:rgba(255,255,255,.18);font-size:12px;letter-spacing:2px;line-height:2.4;
+}
+.s-item{
+  padding:16px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:background .15s;
+}
 .s-item:active{background:rgba(255,255,255,.02);}
 .s-check{
-  flex-shrink:0;width:28px;height:28px;background:none;
-  border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.25);
-  font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;width:26px;height:26px;background:none;
+  border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.2);
+  font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;
   touch-action:manipulation;transition:all .15s;border-radius:50%;
 }
-.s-item.read .s-check{border-color:rgba(196,98,26,.5);color:rgba(240,160,74,.7);}
-.s-item.read .s-check:active,.s-check:active{background:rgba(255,255,255,.08);}
+.s-item.read .s-check{border-color:rgba(196,98,26,.4);color:rgba(240,160,74,.6);}
+.s-check:active{background:rgba(255,255,255,.06);}
 .s-info{flex:1;min-width:0;}
-.s-ttl{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:4px;letter-spacing:1px;}
-.s-auth{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:1px;}
-.s-arrow{color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0;}
-.reader-hd{padding:16px 24px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;}
-.reader-back{background:none;border:none;color:rgba(255,255,255,.3);font-size:16px;cursor:pointer;touch-action:manipulation;padding:4px 8px 4px 0;}
+.s-ttl{
+  font-family:'Shippori Mincho',serif;
+  font-size:14px;color:rgba(240,228,210,.7);
+  margin-bottom:4px;letter-spacing:1px;
+}
+.s-auth{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1px;
+}
+.s-arrow{color:rgba(255,255,255,.12);font-size:12px;flex-shrink:0;}
+.s-item.read .s-ttl{opacity:.35;}
+
+/* リーダー */
+.reader-hd{
+  padding:16px 24px 14px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  flex-shrink:0;
+}
+.reader-back{
+  background:none;border:none;
+  color:rgba(255,255,255,.25);font-size:18px;
+  cursor:pointer;touch-action:manipulation;padding:4px 10px 4px 0;
+  transition:color .15s;
+}
+.reader-back:active{color:rgba(255,255,255,.6);}
 .reader-meta{flex:1;}
-.reader-title{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:1px;}
-.reader-author{font-size:12px;color:rgba(255,255,255,.35);letter-spacing:1px;margin-top:2px;}
+.reader-title{
+  font-family:'Shippori Mincho',serif;
+  font-size:14px;color:rgba(240,228,210,.75);letter-spacing:1px;
+}
+.reader-author{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:3px;
+}
 .reader-acts{display:flex;gap:8px;flex-shrink:0;}
-.reader-src{background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);font-family:'Shippori Mincho',serif;font-size:11px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block;letter-spacing:1px;touch-action:manipulation;}
-.reader-ret{background:none;border:1px solid rgba(200,100,40,.4);color:rgba(200,120,40,.75);font-family:'Shippori Mincho',serif;font-size:11px;padding:8px 14px;cursor:pointer;touch-action:manipulation;letter-spacing:1px;}
-.reader-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px 20px 40px;-webkit-overflow-scrolling:touch;display:flex;justify-content:flex-end;}
-.reader-text{writing-mode:vertical-rl;font-family:'Zen Old Mincho','Shippori Mincho',serif;font-size:17px;line-height:2.1;letter-spacing:.1em;color:rgba(240,228,210,.78);min-height:100%;}
+.reader-src{
+  background:none;border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.35);font-family:'Shippori Mincho',serif;
+  font-size:11px;padding:7px 13px;cursor:pointer;text-decoration:none;
+  display:inline-block;letter-spacing:1px;touch-action:manipulation;
+  transition:all .15s;
+}
+.reader-src:active{background:rgba(255,255,255,.05);}
+.reader-ret{
+  background:none;border:1px solid rgba(200,80,40,.3);
+  color:rgba(200,100,60,.6);font-family:'Shippori Mincho',serif;
+  font-size:11px;padding:7px 13px;cursor:pointer;touch-action:manipulation;
+  letter-spacing:1px;transition:all .15s;
+}
+.reader-ret:active{background:rgba(200,80,40,.08);}
+.reader-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:28px 20px 48px;-webkit-overflow-scrolling:touch;display:flex;justify-content:flex-end;}
+.reader-text{writing-mode:vertical-rl;font-family:'Zen Old Mincho','Shippori Mincho',serif;font-size:17px;line-height:2.1;letter-spacing:.1em;color:rgba(240,228,210,.82);min-height:100%;}
 
 /* ===== 使い方ガイド ===== */
 #guide-overlay{
-  position:absolute;inset:0;z-index:800;background:rgba(0,0,0,.9);
+  position:absolute;inset:0;z-index:800;
+  background:radial-gradient(ellipse at 50% 30%, #0f0c0a 0%, #050403 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:32px 28px;opacity:0;pointer-events:none;transition:opacity .4s;
+  padding:0 36px;opacity:0;pointer-events:none;
+  transition:opacity .6s ease;
+  overflow:hidden;
+}
+/* 背景の縦線装飾 */
+#guide-overlay::before{
+  content:'';position:absolute;
+  top:0;bottom:0;left:50%;transform:translateX(-50%);
+  width:1px;
+  background:linear-gradient(to bottom,transparent 0%,rgba(255,255,255,.04) 20%,rgba(255,255,255,.04) 80%,transparent 100%);
+  pointer-events:none;
 }
 #guide-overlay.show{opacity:1;pointer-events:all;}
-.guide-title{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;letter-spacing:4px;color:rgba(255,255,255,.4);margin-bottom:28px;}
-.guide-items{width:100%;display:flex;flex-direction:column;gap:16px;margin-bottom:36px;}
-.guide-item{display:flex;align-items:flex-start;gap:16px;}
-.guide-arrow{font-size:20px;width:32px;text-align:center;flex-shrink:0;color:rgba(255,255,255,.5);margin-top:2px;}
-.guide-desc{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:1px;line-height:1.8;}
-.guide-desc strong{color:rgba(255,255,255,.85);display:block;font-size:13px;margin-bottom:1px;}
-.guide-close{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-family:'Shippori Mincho',serif;font-size:12px;letter-spacing:3px;padding:12px 32px;cursor:pointer;touch-action:manipulation;transition:all .2s;}
-.guide-close:active{background:rgba(255,255,255,.08);}
-.guide-note-link{margin-top:16px;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.3);text-decoration:none;}
+
+/* トップ装飾 */
+.guide-ornament{
+  margin-bottom:14px;
+  opacity:.35;
+}
+.guide-title{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:26px;letter-spacing:4px;color:rgba(240,228,210,.7);
+  margin-bottom:5px;
+  text-shadow:0 0 60px rgba(240,160,74,.12);
+}
+.guide-title-sub{
+  font-family:'Shippori Mincho',serif;
+  font-size:9px;letter-spacing:6px;color:rgba(255,255,255,.14);
+  margin-bottom:28px;
+}
+/* 二重罫線装飾 */
+.guide-rule{
+  position:relative;
+  width:120px;height:9px;
+  margin-bottom:28px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+}
+.guide-rule::before,.guide-rule::after{
+  content:'';display:block;
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+}
+.guide-rule-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+}
+
+/* アイテムリスト */
+.guide-items{
+  width:100%;max-width:340px;
+  display:flex;flex-direction:column;
+  margin-bottom:32px;
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.guide-item{
+  display:flex;align-items:flex-start;gap:18px;
+  padding:14px 4px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  position:relative;
+}
+/* 選択インジケーター */
+.guide-item::before{
+  content:'';
+  position:absolute;left:-4px;top:50%;transform:translateY(-50%);
+  width:2px;height:0;
+  background:rgba(240,160,74,.4);
+  transition:height .3s ease;
+}
+#guide-overlay.show .guide-item::before{
+  height:60%;
+  transition-delay:calc(var(--i) * .08s + .3s);
+}
+.guide-item:nth-child(1){--i:0;}
+.guide-item:nth-child(2){--i:1;}
+.guide-item:nth-child(3){--i:2;}
+.guide-item:nth-child(4){--i:3;}
+
+.guide-arrow{
+  width:32px;height:32px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  font-size:14px;color:rgba(255,255,255,.4);
+  margin-top:2px;
+}
+.guide-desc{font-size:12px;color:rgba(255,255,255,.32);letter-spacing:1px;line-height:1.7;}
+.guide-desc strong{
+  color:rgba(240,228,210,.8);display:block;
+  font-size:13px;margin-bottom:3px;letter-spacing:1px;
+  font-family:'Shippori Mincho',serif;
+}
+
+/* はじめるボタン */
+.guide-close{
+  background:none;
+  border:none;
+  border-top:1px solid rgba(255,255,255,.12);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  color:rgba(240,228,210,.5);
+  font-family:'Shippori Mincho',serif;
+  font-size:11px;letter-spacing:7px;
+  padding:14px 48px;cursor:pointer;
+  touch-action:manipulation;
+  transition:all .3s;
+  position:relative;
+}
+.guide-close::before,.guide-close::after{
+  content:'';position:absolute;top:50%;
+  width:20px;height:1px;
+  background:rgba(255,255,255,.15);
+  transition:width .3s;
+}
+.guide-close::before{right:calc(100% + 8px);transform:translateY(-50%);}
+.guide-close::after{left:calc(100% + 8px);transform:translateY(-50%);}
+.guide-close:active{
+  color:rgba(240,228,210,.9);
+  border-color:rgba(255,255,255,.25);
+}
+
+.guide-note-link{
+  margin-top:20px;
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:10px;letter-spacing:2px;
+  color:rgba(255,255,255,.14);text-decoration:none;
+}
 
 /* ===== シェアモーダル ===== */
 #share-overlay{
@@ -610,30 +869,31 @@ body::before{
 <div id="filter-drawer">
   <div id="filter-backdrop"></div>
   <div id="filter-panel">
-    <div class="filter-label">GENRE <span id="filter-count" style="font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.18);margin-left:4px;"></span></div>
-    <button class="f-item" data-f="today" id="f-today">今日の冒頭</button>
-    <button class="f-item on" data-f="all">すべて</button>
-    <button class="f-item" data-f="純文学">純文学</button>
-    <button class="f-item" data-f="探偵・推理">探偵・推理</button>
-    <button class="f-item" data-f="怪談・怪異">怪談・怪異</button>
-    <button class="f-item" data-f="恋愛・情念">恋愛・情念</button>
-    <button class="f-item" data-f="歴史・時代">歴史・時代</button>
-    <button class="f-item" data-f="幻想・耽美">幻想・耽美</button>
-    <button class="f-item" data-f="社会・風俗">社会・風俗</button>
-    <!-- 作家一覧 -->
-    <div class="filter-label" style="margin-top:20px;">AUTHORS</div>
-    <div id="author-list" style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px;"></div>
-    <!-- 使い方（フィルターパネル内に統合） -->
-    <div class="filter-label" style="margin-top:20px;">HOW TO USE</div>
-    <div style="font-size:11px;color:rgba(255,255,255,.28);letter-spacing:1px;line-height:2.2;padding-bottom:8px;">
-      <div>↑↓ スワイプ / ホイール / キーで切替</div>
-      <div>❤️ ハートで書棚に保存</div>
-      <div>📚 書棚で保存作品を確認</div>
-      <div>シェア で冒頭を画像・Xに投稿</div>
+    <div id="filter-panel-hd">
+      <div id="filter-panel-hd-title">— 冒頭収集館 —</div>
     </div>
-    <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="filter-note-link">
-      <div class="filter-note-inner">CREATED BY<span>@memetomamoru</span>note.com/memetomamoru</div>
-    </a>
+    <div id="filter-scroll">
+      <div class="filter-label">GENRE <span id="filter-count"></span></div>
+      <button class="f-item" data-f="today" id="f-today">今日の冒頭</button>
+      <button class="f-item on" data-f="all">すべて</button>
+      <button class="f-item" data-f="純文学">純文学</button>
+      <button class="f-item" data-f="探偵・推理">探偵・推理</button>
+      <button class="f-item" data-f="怪談・怪異">怪談・怪異</button>
+      <button class="f-item" data-f="恋愛・情念">恋愛・情念</button>
+      <button class="f-item" data-f="歴史・時代">歴史・時代</button>
+      <button class="f-item" data-f="幻想・耽美">幻想・耽美</button>
+      <button class="f-item" data-f="社会・風俗">社会・風俗</button>
+      <div class="filter-label">AUTHORS</div>
+      <div id="author-list" style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:4px;"></div>
+      <div class="filter-label">HOW TO USE</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">↕</span>スワイプ・ホイール・キーで切替</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">❤</span>ハートで書棚に保存</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">📚</span>書棚で保存作品を確認</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">↑</span>シェアで画像・Xに投稿</div>
+      <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="filter-note-link">
+        <div class="filter-note-inner">CREATED BY<span>@memetomamoru</span>note.com/memetomamoru</div>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -642,7 +902,10 @@ body::before{
   <div id="shelf-panel">
     <div id="shelf-list-view">
       <div class="shelf-hd">
-        <span class="shelf-ttl">私の書棚</span>
+        <div>
+          <div class="shelf-ttl">私の書棚</div>
+          <div class="shelf-ttl-sub">保存した冒頭</div>
+        </div>
         <button class="shelf-close" id="shelf-close">✕</button>
       </div>
       <div class="shelf-bd" id="shelf-bd"></div>
@@ -697,15 +960,43 @@ body::before{
 
 <!-- 使い方ガイド（初回のみ） -->
 <div id="guide-overlay">
-  <div class="guide-title">冒頭収集館へようこそ</div>
+  <div class="guide-ornament">
+    <svg width="32" height="38" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- 本の表紙 -->
+      <rect x="5" y="1" width="24" height="36" rx="2" stroke="rgba(240,228,210,.7)" stroke-width="1.2" fill="none"/>
+      <!-- 背表紙 -->
+      <rect x="1" y="1" width="6" height="36" rx="1.5" stroke="rgba(240,228,210,.5)" stroke-width="1.2" fill="rgba(240,228,210,.04)"/>
+      <!-- 背表紙と本文の境界線 -->
+      <line x1="7" y1="1" x2="7" y2="37" stroke="rgba(240,228,210,.25)" stroke-width="1"/>
+      <!-- ページを示す横線3本 -->
+      <line x1="12" y1="12" x2="26" y2="12" stroke="rgba(240,228,210,.35)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="12" y1="18" x2="26" y2="18" stroke="rgba(240,228,210,.35)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="12" y1="24" x2="22" y2="24" stroke="rgba(240,228,210,.25)" stroke-width="1" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="guide-title">冒頭収集館</div>
+  <div class="guide-title-sub">BOUTOU SHUUSHUKAN</div>
+  <div class="guide-rule"><div class="guide-rule-dot"></div></div>
   <div class="guide-items">
-    <div class="guide-item"><div class="guide-arrow">↑↓</div><div class="guide-desc"><strong>スワイプ / ホイール / キーで切替</strong>上下スワイプ・↑↓キー・マウスホイール・Spaceで次の冒頭へ</div></div>
-    <div class="guide-item"><div class="guide-arrow">❤</div><div class="guide-desc"><strong>ハートで書棚に保存</strong>気になった冒頭をタップして保存。もう一度タップで解除</div></div>
-    <div class="guide-item"><div class="guide-arrow">📚</div><div class="guide-desc"><strong>書棚で保存作品を確認</strong>右上の📚から保存した冒頭をいつでも読み返せる</div></div>
-    <div class="guide-item"><div class="guide-arrow">≡</div><div class="guide-desc"><strong>メニューでジャンル・作家を絞込</strong>右上の≡から今日の冒頭・ジャンル・作家で絞り込み</div></div>
+    <div class="guide-item">
+      <div class="guide-arrow">↕</div>
+      <div class="guide-desc"><strong>スワイプ・ホイール・キーで切替</strong>上下スワイプ、↑↓キー、マウスホイール、Spaceで次の冒頭へ</div>
+    </div>
+    <div class="guide-item">
+      <div class="guide-arrow">❤</div>
+      <div class="guide-desc"><strong>ハートで書棚に保存</strong>気になった冒頭をタップして保存。もう一度で解除</div>
+    </div>
+    <div class="guide-item">
+      <div class="guide-arrow">📚</div>
+      <div class="guide-desc"><strong>書棚で保存作品を確認</strong>右上の📚から保存した冒頭をいつでも読み返せる</div>
+    </div>
+    <div class="guide-item">
+      <div class="guide-arrow">≡</div>
+      <div class="guide-desc"><strong>メニューでジャンル・作家を絞込</strong>今日の冒頭、ジャンル、作家名で絞り込み可能</div>
+    </div>
   </div>
   <button class="guide-close" id="guide-close">は じ め る</button>
-  <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="guide-note-link">制作者のnote → note.com/memetomamoru</a>
+  <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="guide-note-link">note.com/memetomamoru</a>
 </div>
 
 </div><!-- /#app -->
@@ -1084,14 +1375,11 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowUp'  ||e.key==='k'||e.key==='Backspace') { e.preventDefault(); goTo(cur-1); }
 });
 
-// マウスホイール対応（PC）
-var wheelCooldown=false;
+// マウスホイール対応（PC）- transitioningフラグで制御
 deck.addEventListener('wheel',function(e){
-  if(wheelCooldown)return;
-  wheelCooldown=true;
-  setTimeout(function(){wheelCooldown=false;},650);
-  if(e.deltaY>0) goTo(cur+1);
-  else goTo(cur-1);
+  if(transitioning) return;
+  if(e.deltaY > 0) goTo(cur+1);
+  else if(e.deltaY < 0) goTo(cur-1);
 },{passive:true});
 
 // ===== ❤️ハートボタン：保存トグル =====
@@ -1199,7 +1487,7 @@ async function showReader(id){
 function renderShelf(){
   var bd=document.getElementById('shelf-bd');
   if(!shelf.size){
-    bd.innerHTML='<div class="shelf-empty">まだ何も保存していません<br><br>📚ボタンで気になった冒頭を保存</div>';
+    bd.innerHTML='<div class="shelf-empty"><div class="shelf-empty-icon">❤</div><div class="shelf-empty-text">まだ何も保存していません<br>気になった冒頭に❤をどうぞ</div></div>';
     return;
   }
   var entries=[...shelf.entries()];
@@ -1309,10 +1597,10 @@ document.getElementById('share-x-btn').addEventListener('click',function(){
     });
   }
 })();
-var GUIDE_KEY='boutou_guide_v1';
+var GUIDE_KEY='boutou_guide_v2'; // バージョン変えたら再表示される
 document.getElementById('guide-close').addEventListener('click',function(){
   document.getElementById('guide-overlay').classList.remove('show');
-  localStorage.setItem(GUIDE_KEY,'done');
+  localStorage.setItem(GUIDE_KEY, Date.now().toString()); // 閉じた日時を保存
 });
 
 // ===== 初期化 =====
@@ -1338,7 +1626,10 @@ async function init(){
   if(fc) fc.textContent='— '+list.length+'作品';
   initAuthorList();
   build();
-  if(!localStorage.getItem(GUIDE_KEY)){
+  // ガイド表示：初回 または 30日経過後
+  var lastSeen = parseInt(localStorage.getItem(GUIDE_KEY)||'0');
+  var thirtyDays = 30 * 24 * 60 * 60 * 1000;
+  if(!lastSeen || Date.now() - lastSeen > thirtyDays){
     document.getElementById('guide-overlay').classList.add('show');
   }
 }
