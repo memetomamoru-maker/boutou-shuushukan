@@ -1134,19 +1134,17 @@ function cleanText(raw){
     const kuten = body.indexOf('。', pos);
     if(kuten === -1) break;
     const candidate = body.slice(0, kuten + 1);
-    // MINに達した時点でresultを更新、MAX超えたら即終了
-    if(candidate.length >= MIN) result = candidate;
-    if(candidate.length >= MAX) break;
+    if(candidate.length > MAX) break;  // MAX超えたら採用せず終了
+    if(candidate.length >= MIN) result = candidate;  // MIN以上なら候補として保持
     pos = kuten + 1;
   }
 
   // ① 句点が見つからない or MINに届かなかった場合
-  //    → 最初の句点まで（なければMAXで切る）
   if(!result){
     const firstKuten = body.indexOf('。');
     if(firstKuten !== -1){
-      // 第1文が長い場合はMAXで強制カット
-      result = body.slice(0, Math.min(firstKuten + 1, MAX + 20));
+      // 第1文が長くてもMAXで強制カット
+      result = body.slice(0, Math.min(firstKuten + 1, MAX));
     } else {
       // 句点が全くない → 読点か改行か文字数で切る
       const cut = body.slice(0, MAX);
@@ -1156,6 +1154,9 @@ function cleanText(raw){
       result = boundary > 20 ? cut.slice(0, boundary + 1) : cut;
     }
   }
+
+  // 念のため最終的にMAXで強制カット
+  if(result.length > MAX + 10) result = result.slice(0, MAX);
 
   // ② 末尾が句点でなければ直前の句点まで切り詰め（最終保険）
   if(result && !result.endsWith('。')){
