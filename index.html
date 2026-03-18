@@ -158,7 +158,7 @@ body::before{
 .card-text-wrap{
   flex:1;position:relative;z-index:5;
   display:flex;align-items:flex-start;justify-content:flex-end;
-  padding:20px 24px 90px; /* 下90px = actionbar分 */
+  padding:20px 32px 90px 24px; /* 右32px = 句読点見切れ防止 */
   overflow:hidden;
 }
 @keyframes textDrift{0%,100%{opacity:.92;}50%{opacity:1;}}
@@ -170,6 +170,8 @@ body::before{
   font-family:'Zen Old Mincho','Shippori Mincho',serif;
   font-size:clamp(17px,4.5vw,22px);line-height:2.1;letter-spacing:.15em;
   color:rgba(240,228,210,.88);height:auto;overflow:visible;
+  font-feature-settings:"vkna" 1,"vert" 1;
+  text-combine-upright:none;
 }
 
 /* ===== ACTION BAR ===== */
