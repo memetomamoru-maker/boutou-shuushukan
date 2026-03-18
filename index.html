@@ -6,7 +6,7 @@
 <title>冒頭収集館 — 名作の書き出しを、毎日ひとつ。</title>
 
 <!-- SEO -->
-<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など600作品以上収録。600作品の中から毎日1作品が日替わりで表示されます。">
+<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。毎日1作品が日替わりで表示されます。">
 <meta name="keywords" content="冒頭,文学,青空文庫,芥川龍之介,夏目漱石,太宰治,江戸川乱歩,読書">
 <meta name="author" content="memetomamoru">
 
@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="冒頭収集館">
 <meta property="og:url" content="https://boutou-shuushukan.vercel.app/">
 <meta property="og:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
-<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など600作品以上収録。600作品の中から毎日1作品が日替わりで表示されます。">
+<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。毎日1作品が日替わりで表示されます。">
 <meta property="og:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -26,7 +26,7 @@
 <meta name="twitter:site" content="@memetomamoru">
 <meta name="twitter:url" content="https://boutou-shuushukan.vercel.app/">
 <meta name="twitter:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
-<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など600作品以上収録。600作品の中から毎日1作品が日替わりで表示されます。">
+<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。毎日1作品が日替わりで表示されます。">
 <meta name="twitter:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
 
 <!-- PWA / iOS -->
@@ -943,7 +943,7 @@ body::before{
       <div id="filter-panel-hd-title">— 冒頭収集館 —</div>
     </div>
     <div id="filter-scroll">
-      <div class="filter-label">GENRE <span id="filter-count"></span></div>
+      <div class="filter-label">GENRE</div>
       <button class="f-item" data-f="today" id="f-today">日替わり冒頭</button>
       <button class="f-item on" data-f="all">すべて</button>
       <button class="f-item" data-f="純文学">純文学</button>
@@ -1232,32 +1232,32 @@ function getTodayIndex(len){
 function build(){
   deck.innerHTML=''; cards=[];
   
-  // 今日の作品を先頭に移動（listは破壊しない）
-  var todayIdx=getTodayIndex(list.length);
   var displayList=list.slice();
-  if(todayIdx>0){
-    var todayItem=displayList.splice(todayIdx,1)[0];
-    displayList.unshift(todayItem);
+
+  // 「全て」表示のときだけ日替わり冒頭を先頭に移動
+  if(filterVal==='all'){
+    var todayIdx=getTodayIndex(displayList.length);
+    if(todayIdx>0){
+      var todayItem=displayList.splice(todayIdx,1)[0];
+      displayList.unshift(todayItem);
+    }
   }
-  
+
   displayList.forEach(function(w,i){
     var el = buildCard(w,i);
     if(i===0){
       el.classList.add('is-current');
-      // 「日替わり冒頭」バッジをジャンルバッジの下に追加
-      var badge=document.createElement('div');
-      badge.className='today-badge';
-      badge.textContent='日替わり冒頭';
-      // 日付を card-top-row の右端に追加
-      var d=new Date();
-      var month=d.getMonth()+1;
-      var day=d.getDate();
-      el.querySelector('.card-top').appendChild(badge);
+      // 「全て」のときだけ日替わり冒頭バッジを付ける
+      if(filterVal==='all'){
+        var badge=document.createElement('div');
+        badge.className='today-badge';
+        badge.textContent='日替わり冒頭';
+        el.querySelector('.card-top').appendChild(badge);
+      }
     }
     deck.appendChild(el);
     cards.push(el);
   });
-  // 表示用リストで上書き（カード順序と一致させる）
   list=displayList;
   cur=0;
   updateProgress();
@@ -1517,8 +1517,6 @@ function applyFilter(){
     base=base.filter(function(w){return w.author===filterAuthor;});
   }
   list=base;
-  var fc=document.getElementById('filter-count');
-  if(fc) fc.textContent='— '+list.length+'作品';
   build();
   // 「日替わり冒頭」フィルターの場合は先頭1枚だけ
   if(filterVal==='today'){
@@ -1727,8 +1725,6 @@ async function init(){
   try{ var r=await fetch('./booklist.json'); BOOKLIST=await r.json(); }
   catch(e){ BOOKLIST=[]; }
   list=[...BOOKLIST];
-  var fc=document.getElementById('filter-count');
-  if(fc) fc.textContent='— '+list.length+'作品';
   initAuthorList();
   build();
   // ガイド表示：初回 または 30日経過後
