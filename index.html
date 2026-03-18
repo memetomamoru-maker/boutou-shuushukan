@@ -1126,6 +1126,9 @@ function cleanText(raw){
     .replace(/\r\n/g,'\n').replace(/\r/g,'\n')
     .replace(/\n{3,}/g,'\n\n').trim();
 
+  // 章番号・見出し行（単独の数字・漢数字・記号のみの行）を除去
+  body = body.replace(/^[\s　]*[一二三四五六七八九十百千〇0-9０-９※◎○●◆◇■□△▲▽▼\-―─━─＊\*]+[\s　]*\n+/g,'').trim();
+
   const MAX = 190, MIN = 55;
   let result = '';
   let pos = 0;
