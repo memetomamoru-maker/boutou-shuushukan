@@ -854,11 +854,12 @@ body::before{
 }
 .share-accent-line{height:1px;margin-bottom:20px;}
 .share-first-sentence{
-  writing-mode:vertical-rl;font-family:'Zen Old Mincho',serif;
+  writing-mode:vertical-rl;font-family:'Shippori Mincho','Zen Old Mincho',serif;
   font-size:18px;line-height:2.0;letter-spacing:.12em;
   color:rgba(240,228,210,.95);
   max-height:220px;overflow:hidden;
   align-self:flex-end;display:block;margin:0 auto 20px;
+  text-orientation:mixed;
 }
 .share-meta-row{display:flex;justify-content:space-between;align-items:flex-end;}
 .share-author-block{}
@@ -1674,7 +1675,7 @@ document.getElementById('share-img-btn').addEventListener('click',async function
   var btn=this; btn.textContent='生成中…'; btn.disabled=true;
   try{
     var card=document.getElementById('share-card');
-    var canvas=await html2canvas(card,{backgroundColor:'#0e0c0a',scale:2,useCORS:true,logging:false});
+    var canvas=await html2canvas(card,{backgroundColor:'#0e0c0a',scale:window.devicePixelRatio||1,useCORS:true,logging:false});
     var w=list[cur];
     var link=document.createElement('a');
     link.download='boutou_'+(w?w.author:'unknown')+'.png';
