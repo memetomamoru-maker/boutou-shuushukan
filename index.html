@@ -123,15 +123,15 @@ body::before{
   content:'';display:inline-block;width:20px;height:1px;
   background:rgba(255,255,255,.25);
 }
-/* 日付：テキスト右下に横書きで */
+/* 日付：card-top右端に横並び（テキストエリア外） */
 .today-date{
-  position:absolute;
-  bottom:92px;right:24px;
-  z-index:10;pointer-events:none;
+  margin-left:auto;
   font-family:'IM Fell English',serif;font-style:italic;
   font-size:11px;letter-spacing:2px;
-  color:rgba(255,255,255,.2);
-  writing-mode:horizontal-tb;
+  color:rgba(255,255,255,.22);
+  white-space:nowrap;
+  align-self:flex-end;
+  padding-bottom:1px;
 }
 
 /* TEXT AREA */
@@ -1166,15 +1166,16 @@ function build(){
       var badge=document.createElement('div');
       badge.className='today-badge';
       badge.textContent='今日の冒頭';
-      el.querySelector('.card-top').appendChild(badge);
-      // 日付をテキストエリア右下に横書きで
+      // 日付を card-top-row の右端に追加
       var d=new Date();
       var month=d.getMonth()+1;
       var day=d.getDate();
       var dateEl=document.createElement('div');
       dateEl.className='today-date';
       dateEl.textContent=month+'.'+day;
-      el.appendChild(dateEl);
+      var topRow=el.querySelector('.card-top-row');
+      if(topRow) topRow.appendChild(dateEl);
+      el.querySelector('.card-top').appendChild(badge);
     }
     deck.appendChild(el);
     cards.push(el);
