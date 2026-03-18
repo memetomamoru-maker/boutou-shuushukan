@@ -1264,8 +1264,8 @@ function build(){
   
   var displayList=list.slice();
 
-  // 「全て」表示のときだけ日替わり冒頭を先頭に移動
-  if(filterVal==='all'){
+  // 「全て」or「日替わり冒頭」のとき日替わりを先頭に移動
+  if(filterVal==='all' || filterVal==='today'){
     var todayIdx=getTodayIndex(displayList.length);
     if(todayIdx>0){
       var todayItem=displayList.splice(todayIdx,1)[0];
@@ -1277,8 +1277,8 @@ function build(){
     var el = buildCard(w,i);
     if(i===0){
       el.classList.add('is-current');
-      // 「全て」のときだけ日替わり冒頭バッジを付ける
-      if(filterVal==='all'){
+      // 「全て」or「日替わり冒頭」のときバッジを付ける
+      if(filterVal==='all' || filterVal==='today'){
         var badge=document.createElement('div');
         badge.className='today-badge';
         badge.textContent='日替わり冒頭';
@@ -1550,13 +1550,14 @@ function applyFilter(){
   if(filterAuthor){
     base=base.filter(function(w){return w.author===filterAuthor;});
   }
-  list=base;
-  build();
-  // 「日替わり冒頭」フィルターの場合は先頭1枚だけ
+  // 「日替わり冒頭」フィルターの場合は日替わり1枚だけに絞る
   if(filterVal==='today'){
-    list=[list[0]];
-    build();
+    var todayIdx=getTodayIndex(base.length);
+    list=[base[todayIdx]||base[0]];
+  } else {
+    list=base;
   }
+  build();
 }
 
 function initAuthorList(){
