@@ -1130,10 +1130,14 @@ function cleanText(raw){
     .replace(/\r\n/g,'\n').replace(/\r/g,'\n')
     .replace(/\n{3,}/g,'\n\n').trim();
 
-  // 章番号・見出し行（単独の数字・漢数字・記号のみの行）を除去
-  body = body.replace(/^[\s　]*[一二三四五六七八九十百千〇0-9０-９※◎○●◆◇■□△▲▽▼\-―─━─＊\*]+[\s　]*\n+/g,'').trim();
+  // 章番号・見出し行を先頭から繰り返し除去
+  // パターン1: 数字・漢数字・記号のみの行（1〜6文字）
+  // パターン2: 「第〇〇」で始まる見出し行
+  // パターン3: 6文字以下で句点・読点なしの行
+  var headingPattern = /^([\s　]*(([一二三四五六七八九十百千〇0-9０-９※◎○●◆◇■□△▲▽▼\-―─━＊\*]{1,6}|第[^\n]{1,20})[\s　]*\n+|[^\n。、]{1,6}\n+))+/;
+  body = body.replace(headingPattern, '').trim();
 
-  const MAX = 190, MIN = 55;
+  const MAX = 190, MIN = 30;
   let result = '';
   let pos = 0;
 
