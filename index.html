@@ -1640,13 +1640,12 @@ document.getElementById('btn-share').addEventListener('click',function(){
   document.getElementById('share-work').textContent='『'+w.title+'』';
   document.getElementById('share-accent-line').style.background='linear-gradient(90deg,'+accent+',transparent)';
   var commentEl=document.getElementById('share-comment');
-  if(commentEl) commentEl.value='';
+  if(commentEl) { commentEl.value=''; commentEl.disabled=false; }
   document.getElementById('share-overlay').classList.add('show');
-  // モーダル表示後にtextareaのスクロール問題を防ぐ
-  setTimeout(function(){ if(commentEl) commentEl.blur(); },50);
 });
 document.getElementById('share-close-btn').addEventListener('click',function(){
   document.getElementById('share-overlay').classList.remove('show');
+  var c=document.getElementById('share-comment'); if(c){c.value='';c.disabled=false;}
 });
 document.getElementById('share-img-btn').addEventListener('click',async function(){
   var btn=this; btn.textContent='生成中…'; btn.disabled=true;
@@ -1668,6 +1667,7 @@ document.getElementById('share-img-btn').addEventListener('click',async function
     }
   }finally{
     btn.textContent='画像保存'; btn.disabled=false;
+    var c=document.getElementById('share-comment'); if(c){c.value='';c.disabled=false;}
     document.getElementById('share-overlay').classList.remove('show');
   }
 });
@@ -1681,6 +1681,7 @@ document.getElementById('share-x-btn').addEventListener('click',function(){
     '#冒頭収集館 #青空文庫';
   var url='https://boutou-shuushukan.vercel.app';
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweetText)+'&url='+encodeURIComponent(url),'_blank','noopener');
+  var c=document.getElementById('share-comment'); if(c){c.value='';c.disabled=false;}
   document.getElementById('share-overlay').classList.remove('show');
 });
 
