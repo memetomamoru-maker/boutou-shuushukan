@@ -1129,7 +1129,7 @@ function cleanText(raw){
   // 先頭のダッシュ・記号を除去（「―むっつり…」のようなケース）
   body = body.replace(/^[―─━\-＝＊※◎○●◆◇■□▲▽▼\s　]+/, '').trim();
 
-  const MAX = 190, MIN = 15;
+  const MAX = 190;
   let result = '';
   let pos = 0;
 
@@ -1137,12 +1137,12 @@ function cleanText(raw){
     const kuten = body.indexOf('。', pos);
     if(kuten === -1) break;
     const candidate = body.slice(0, kuten + 1);
-    if(candidate.length > MAX) break;  // MAX超えたら採用せず終了
-    if(candidate.length >= MIN) result = candidate;  // MIN以上なら候補として保持
+    if(candidate.length > MAX) break;
+    result = candidate; // MAX以内なら常に更新
     pos = kuten + 1;
   }
 
-  // ① 句点が見つからない or MINに届かなかった場合
+  // ① 句点が見つからない場合
   if(!result){
     const firstKuten = body.indexOf('。');
     if(firstKuten !== -1){
