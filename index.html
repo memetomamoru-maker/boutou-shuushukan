@@ -1454,34 +1454,33 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowUp'  ||e.key==='k'||e.key==='Backspace') { e.preventDefault(); goTo(cur-1); }
 });
 
-// マウスホイール対応（PC / Magic Mouse / トラックパッド）
-// Magic Mouseは1スワイプで大量のwheelイベントが連続発火するため
-// deltaYを累積して閾値を超えたら1回だけ発火する方式に変更
+// マウスホイール対応（Magic Mouse / トラックパッド対策）
+// 発火後は animationの完了(600ms)までハードロック
+var wheelLocked = false;
 var wheelAccum = 0;
-var wheelTimer = null;
+var wheelResetTimer = null;
+
 deck.addEventListener('wheel', function(e){
-  // トラックパッド判定：deltaMode===0 かつ deltaY が小数を含む場合はトラックパッド
-  // Magic Mouseも同様のイベントを出すため同じ処理
+  if(wheelLocked) return;
+
   wheelAccum += e.deltaY;
-  clearTimeout(wheelTimer);
-  // 累積が閾値（100）を超えたら即発火
-  if(Math.abs(wheelAccum) >= 100){
-    if(!transitioning){
-      if(wheelAccum > 0) goTo(cur+1);
-      else goTo(cur-1);
-    }
-    wheelAccum = 0;
-  } else {
-    // 閾値未満でも200ms後に発火（ゆっくりスワイプ対応）
-    wheelTimer = setTimeout(function(){
-      if(!transitioning && Math.abs(wheelAccum) > 20){
-        if(wheelAccum > 0) goTo(cur+1);
-        else goTo(cur-1);
-      }
-      wheelAccum = 0;
-    }, 200);
-  }
-},{passive:true});
+
+  // 累積リセットタイマー（止まったら0に戻す）
+  clearTimeout(wheelResetTimer);
+  wheelResetTimer = setTimeout(function(){ wheelAccum = 0; }, 150);
+
+  // 閾値60を超えたら発火してハードロック
+  if(Math.abs(wheelAccum) < 60) return;
+
+  var dir = wheelAccum > 0 ? 1 : -1;
+  wheelAccum = 0;
+  wheelLocked = true;
+
+  goTo(cur + dir);
+
+  // アニメーション完了より少し長めにロック
+  setTimeout(function(){ wheelLocked = false; }, 650);
+}, {passive: true});
 
 // ===== ❤️ハートボタン：保存トグル =====
 document.getElementById('btn-heart').addEventListener('click',function(){
