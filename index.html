@@ -1456,6 +1456,9 @@ if(navPrev) navPrev.addEventListener('click',function(){goTo(cur-1);});
 if(navNext) navNext.addEventListener('click',function(){goTo(cur+1);});
 
 document.addEventListener('keydown',function(e){
+  if(document.getElementById('share-overlay').classList.contains('show')) return;
+  if(document.getElementById('filter-drawer').classList.contains('open')) return;
+  if(document.getElementById('shelf-drawer').classList.contains('open')) return;
   if(e.key==='ArrowDown'||e.key==='j'||e.key===' '||e.key==='Enter') { e.preventDefault(); goTo(cur+1); }
   if(e.key==='ArrowUp'  ||e.key==='k'||e.key==='Backspace') { e.preventDefault(); goTo(cur-1); }
 });
@@ -1467,6 +1470,7 @@ var wheelAccum = 0;
 var wheelResetTimer = null;
 
 deck.addEventListener('wheel', function(e){
+  if(document.getElementById('share-overlay').classList.contains('show')) return;
   if(wheelLocked) return;
 
   wheelAccum += e.deltaY;
