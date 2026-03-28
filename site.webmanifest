@@ -1,16 +1,37 @@
 {
   "name": "冒頭収集館",
   "short_name": "冒頭収集館",
-  "start_url": "./",
+  "description": "名作文学の書き出しを、毎日ひとつ。夏目漱石・芥川龍之介・太宰治など日本文学のパブリックドメイン作品の冒頭をスワイプして楽しむアプリ。",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
+  "orientation": "portrait",
+  "lang": "ja",
+  "dir": "ltr",
+  "categories": ["books", "education", "entertainment"],
   "icons": [
+    {
+      "src": "./icon-512.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "./ogp.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "label": "冒頭収集館 — 名作の書き出しを、毎日ひとつ。"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
