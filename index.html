@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>冒頭収集館</title><!-- v2 -->
+<title>冒頭収集館</title><!-- v3 -->
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after {
@@ -927,61 +927,6 @@ function hideBgOverlay(){setTimeout(()=>{document.getElementById('bg-overlay')?.
 function updateActionBar(){const w=list[cur];if(!w)return;const ae=document.getElementById('action-author'),te=document.getElementById('action-title'),se=document.getElementById('action-src'),sh=document.getElementById('btn-shelf');if(ae)ae.textContent=w.author;if(te)te.textContent='『'+w.title+'』';if(se)se.href=toAozoraUrl(w.path);if(sh)sh.classList.toggle('has-items',lending.size>0);document.body.setAttribute('data-genre',AUTHOR_GENRE[w.author]||'純文学');}
 function addSwipeHint(){const c=cards[0];if(c){c.classList.add('swipe-hint');setTimeout(()=>c.classList.remove('swipe-hint'),3000);}}
 
-// ===== SNS用画像保存（Canvas直描画・縦書き対応） =====
-function saveCardImage() {
-  const w = list[cur];
-  if (!w) return;
-  const text = document.querySelector('.card.is-current .card-text')?.textContent || '';
-  const W = 1080, H = 1350;
-  const cv = document.createElement('canvas');
-  cv.width = W; cv.height = H;
-  const ctx = cv.getContext('2d');
-  // 背景
-  ctx.fillStyle = '#050505';
-  ctx.fillRect(0, 0, W, H);
-  // グリッド
-  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-  ctx.lineWidth = 1;
-  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  // 縦書きテキスト
-  ctx.font = '36px serif';
-  ctx.fillStyle = 'rgba(240,228,210,0.92)';
-  ctx.textBaseline = 'top';
-  // 右から左へ縦書きで描画
-  const lineH = 46;
-  const startX = W - 80;
-  let x = startX, y = 80;
-  for(const ch of text) {
-    // 句読点・長音の縦書き変換
-    let draw = ch;
-    if(ch === '、') draw = '︑';
-    else if(ch === '。') draw = '︒';
-    else if(ch === 'ー') draw = '｜';
-    else if(ch === '…') draw = '︙';
-    else if(ch === '「') draw = '﹁';
-    else if(ch === '」') draw = '﹂';
-    else if(ch === '（') draw = '︵';
-    else if(ch === '）') draw = '︶';
-    ctx.fillText(draw, x, y);
-    y += lineH;
-    if(y + lineH > H - 120) { y = 80; x -= lineH; }
-  }
-  // 著者・タイトル（右下）
-  ctx.font = '28px serif';
-  ctx.fillStyle = 'rgba(240,228,210,0.5)';
-  ctx.textAlign = 'right';
-  ctx.fillText(w.author + '　『' + w.title + '』', W - 60, H - 80);
-  // ロゴ
-  ctx.font = '18px serif';
-  ctx.fillStyle = 'rgba(240,228,210,0.2)';
-  ctx.textAlign = 'left';
-  ctx.fillText('冒頭収集館', 60, H - 80);
-  // ダウンロード
-  const a = document.createElement('a');
-  a.href = cv.toDataURL('image/png');
-  a.download = (w.author + '_' + w.title).replace(/[^w　-鿿]/g,'') + '.png';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 function updateProgress() {
   const prog = document.getElementById('progress');
