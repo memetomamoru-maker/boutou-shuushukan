@@ -3,677 +3,985 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>冒頭収集館</title>
+<title>冒頭収集館 — 名作の書き出しを、毎日ひとつ。</title>
+
+<!-- SEO -->
+<meta name="description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。毎日1作品が日替わりで表示されます。">
+<meta name="keywords" content="冒頭,文学,青空文庫,芥川龍之介,夏目漱石,太宰治,江戸川乱歩,読書">
+<meta name="author" content="memetomamoru">
+
+<!-- OGP -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="冒頭収集館">
+<meta property="og:url" content="https://boutou-shuushukan.vercel.app/">
+<meta property="og:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
+<meta property="og:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。毎日1作品が日替わりで表示されます。">
+<meta property="og:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@memetomamoru">
+<meta name="twitter:url" content="https://boutou-shuushukan.vercel.app/">
+<meta name="twitter:title" content="冒頭収集館 — 名作の書き出しを、毎日ひとつ。">
+<meta name="twitter:description" content="名作の「冒頭」だけを集めた文学アプリ。芥川・漱石・太宰・乱歩など500作品以上収録。毎日1作品が日替わりで表示されます。">
+<meta name="twitter:image" content="https://boutou-shuushukan.vercel.app/ogp.png">
+
+<!-- PWA / iOS -->
+<meta name="theme-color" content="#050403">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="冒頭収集館">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+<link rel="apple-touch-icon" href="./icon-512.png">
+<link rel="manifest" href="./site.webmanifest">
 <style>
-*, *::before, *::after {
-  margin: 0; padding: 0; box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--dur:.48s;--ease:cubic-bezier(.76,0,.24,1);}
+
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:#050505;font-family:'Shippori Mincho',serif;
+  user-select:none;-webkit-user-select:none;
+  overscroll-behavior-x:none;
 }
 
-:root {
-  --dur: .48s;
-  --ease: cubic-bezier(.76,0,.24,1);
+/* 背景 */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
 }
 
-html, body {
-  width: 100%; height: 100%;
-  overflow: hidden;
-  background: #050505;
-  font-family: 'Shippori Mincho', serif;
-  user-select: none;
-  -webkit-user-select: none;
+@media (max-width: 767px){
+  body::before{
+    background:none;
+  }
 }
 
-/* PC：中央に固定幅で表示 */
-#app {
-  position: fixed;
-  top: 0; bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
-  /* PC時に左右に微かな影でスマホ感を演出 */
-  box-shadow: 0 0 80px rgba(0,0,0,.8);
+@media (min-width: 768px){
+  body::before{
+    background:
+      linear-gradient(rgba(0,0,0,.42), rgba(0,0,0,.42)),
+      url('./bg-silhouette.png') center center / cover no-repeat;
+  }
+
+  /* PCではbg画像と重ねてblend */
+  #grad-bg{
+    mix-blend-mode: screen;
+  }
+  #grad-bg.active { opacity: 0.4 !important; }
 }
 
-/* PC背景：グリッド模様で奥行き感 */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
+#app{
+  position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;box-shadow:0 0 80px rgba(0,0,0,.8);
+  overflow:hidden;
 }
 
-/* ==============================
-   DECK: カードスタック
-============================== */
-#deck {
-  position: absolute;
-  inset: 0;
-  touch-action: none;
+/* 墨滲みレイヤー削除済み */
+
+/* ===== DECK ===== */
+#deck{position:absolute;inset:0;touch-action:none;overscroll-behavior-x:none;z-index:2;}
+
+/* ===== CARD ===== */
+.card{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  will-change:transform,opacity;
+  transform:translateY(100vh);
+  transition:transform var(--dur) var(--ease),opacity var(--dur) ease;
+  opacity:0;overflow:hidden;touch-action:none;
+  isolation:isolate; /* オーロラがカードの背景と合成 */
+}
+.card.is-current{transform:translateY(0);opacity:1;}
+.card.is-above  {transform:translateY(-100vh);opacity:0;}
+.card.is-drag   {transition:none;}
+
+.card-bg{position:absolute;inset:0;z-index:0;}
+.card[data-g="純文学"]    .card-bg{background:linear-gradient(160deg,#1a1614 0%,#2d2118 40%,#1a1614 100%);}
+.card[data-g="探偵・推理"] .card-bg{background:linear-gradient(160deg,#0d1520 0%,#102035 40%,#0d1520 100%);}
+.card[data-g="怪談・怪異"] .card-bg{background:linear-gradient(160deg,#120d1a 0%,#1e1228 40%,#120d1a 100%);}
+.card[data-g="恋愛・情念"] .card-bg{background:linear-gradient(160deg,#1a0d10 0%,#2a1018 40%,#1a0d10 100%);}
+.card[data-g="幻想・耽美"] .card-bg{background:linear-gradient(160deg,#0d1a14 0%,#102614 40%,#0d1a14 100%);}
+.card[data-g="社会・風俗"] .card-bg{background:linear-gradient(160deg,#101614 0%,#152018 40%,#101614 100%);}
+
+.card-bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size:200px;opacity:.5;pointer-events:none;
 }
 
-/* ==============================
-   CARD
-============================== */
-.card {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  will-change: transform, opacity;
-  transform: translateY(100vh);
-  transition: transform var(--dur) var(--ease), opacity var(--dur) ease;
-  opacity: 0;
-  /* カード内の縦スクロールを許可 */
-  overflow-y: hidden;
-  touch-action: none;
+.card-accent{position:absolute;left:0;right:0;top:0;height:2px;z-index:10;}
+.card[data-g="純文学"]    .card-accent{background:linear-gradient(90deg,#c4621a,#e8a04a,transparent);}
+.card[data-g="探偵・推理"] .card-accent{background:linear-gradient(90deg,#2a6090,#4a9cc8,transparent);}
+.card[data-g="怪談・怪異"] .card-accent{background:linear-gradient(90deg,#6a2090,#a050d0,transparent);}
+.card[data-g="恋愛・情念"] .card-accent{background:linear-gradient(90deg,#902040,#d04070,transparent);}
+.card[data-g="幻想・耽美"] .card-accent{background:linear-gradient(90deg,#1a7a40,#30b060,transparent);}
+.card[data-g="社会・風俗"] .card-accent{background:linear-gradient(90deg,#2a6a40,#40a060,transparent);}
+
+/* TOP META */
+.card-top{position:relative;z-index:10;padding:14px 20px 0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;flex-shrink:0;}
+.card-top-row{display:flex;align-items:center;gap:10px;width:100%;}
+.genre-badge{
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  padding:3px 10px;border:1px solid currentColor;opacity:.85;
+}
+.card[data-g="純文学"]    .genre-badge{color:#e8a04a;}
+.card[data-g="探偵・推理"] .genre-badge{color:#4a9cc8;}
+.card[data-g="怪談・怪異"] .genre-badge{color:#a050d0;}
+.card[data-g="恋愛・情念"] .genre-badge{color:#d04070;}
+.card[data-g="幻想・耽美"] .genre-badge{color:#30b060;}
+.card[data-g="社会・風俗"] .genre-badge{color:#40a060;}
+
+/* 日替わり冒頭バッジ：ジャンルバッジの下に独立した行で */
+.today-badge{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.4);
+  white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.today-badge::before{
+  content:'';display:inline-block;width:20px;height:1px;
+  background:rgba(255,255,255,.25);
 }
 
-.card.is-current {
-  transform: translateY(0);
-  opacity: 1;
+/* TEXT AREA */
+.card-text-wrap{
+  flex:1;position:relative;z-index:5;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:20px 32px 90px 24px; /* 右32px = 句読点見切れ防止 */
+  overflow:hidden;
+}
+@keyframes textDrift{0%,100%{opacity:.92;}50%{opacity:1;}}
+.card.is-current .card-text-wrap{animation:textDrift 4s ease-in-out infinite;}
+.card.is-current.swiping-active .card-text-wrap{animation:none;}
+
+.card-text{
+  writing-mode:vertical-rl;text-orientation:mixed;
+  font-family:'Shippori Mincho','Zen Old Mincho',serif;
+  font-size:clamp(17px,4.5vw,22px);line-height:2.1;letter-spacing:.15em;
+  color:rgba(240,228,210,.88);height:auto;overflow:visible;
 }
 
-.card.is-above {
-  transform: translateY(-100vh);
-  opacity: 0;
+
+/* ===== ACTION BAR ===== */
+#action-bar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;z-index:400;
+  background:linear-gradient(to top,rgba(5,5,5,.97) 0%,rgba(5,5,5,.7) 60%,transparent 100%);
+  pointer-events:none;
+}
+.action-bar-inner{
+  display:flex;align-items:center;
+  padding:8px 14px 16px;gap:8px;pointer-events:all;
+}
+.action-info{flex:1;min-width:0;}
+.action-author{font-size:14px;font-weight:700;color:rgba(240,228,210,.9);letter-spacing:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.action-title{font-size:10px;color:rgba(240,228,210,.35);letter-spacing:1px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.action-btns{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+
+.action-btn{
+  flex-shrink:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.6);font-family:'Shippori Mincho',serif;
+  font-size:10px;padding:7px 12px;cursor:pointer;letter-spacing:1px;
+  touch-action:manipulation;text-decoration:none;
+  display:inline-flex;align-items:center;white-space:nowrap;
+  transition:background .2s;-webkit-tap-highlight-color:transparent;
+}
+.action-btn:active{background:rgba(255,255,255,.16);}
+
+/* ハートボタン */
+.action-icon-btn{
+  flex-shrink:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.45);
+  width:42px;height:42px;min-width:42px;
+  cursor:pointer;touch-action:manipulation;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;position:relative;
+  transition:background .2s, color .2s, border-color .2s;-webkit-tap-highlight-color:transparent;
+}
+.action-icon-btn:active{background:rgba(255,255,255,.16);}
+/* 保存済み：ハートが赤く */
+#btn-heart.liked{
+  border-color:rgba(220,60,80,.6);
+  color:rgba(230,60,80,1);
+  background:rgba(220,60,80,.12);
+}
+#btn-heart.liked #heart-icon{
+  fill:rgba(230,60,80,1);
+  stroke:rgba(230,60,80,1);
 }
 
-.card.is-drag {
-  transition: none;
+/* ハートバウンス */
+@keyframes heartBeat{
+  0%  {transform:scale(1)}
+  20% {transform:scale(1.45)}
+  40% {transform:scale(0.88)}
+  60% {transform:scale(1.22)}
+  80% {transform:scale(0.96)}
+  100%{transform:scale(1)}
+}
+#btn-heart.beat #heart-icon{animation:heartBeat .5s ease forwards;}
+
+/* 書棚バウンス（旧コード互換） */
+@keyframes shelfBounce{0%{transform:scale(1)}25%{transform:scale(1.55)}50%{transform:scale(0.85)}75%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+/* 保存済みフラッシュ */
+@keyframes savedFlash{0%{opacity:0;transform:translateY(-4px)}20%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translateY(-12px)}}
+#saved-toast{
+  position:absolute;bottom:70px;right:14px;z-index:500;
+  font-size:10px;letter-spacing:2px;color:rgba(240,160,74,.9);
+  pointer-events:none;opacity:0;
+}
+#saved-toast.show{animation:savedFlash 1.4s ease forwards;}
+
+.action-badge{
+  position:absolute;top:-3px;right:-3px;
+  min-width:16px;height:16px;background:#c4621a;border-radius:8px;
+  font-size:9px;color:#fff;display:none;
+  align-items:center;justify-content:center;font-family:sans-serif;padding:0 3px;
 }
 
-/* ==============================
-   CARD BG — ジャンルごとの世界観
-============================== */
-.card-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: url("data:image/webp;base64,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");
-  background-size: cover;
-  background-position: center right;
-  opacity: 0.35;
+/* ===== PWAインストール訴求バナー（SP限定） ===== */
+#pwa-banner{
+  position:absolute;bottom:76px;left:14px;right:14px;
+  z-index:600;
+  background:linear-gradient(135deg,#0e0b08 0%,#0a0907 100%);
+  border:1px solid rgba(255,255,255,.1);
+  border-left:2px solid rgba(240,160,74,.3);
+  padding:14px 16px;
+  display:none;
+  align-items:center;gap:14px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+@keyframes bannerUp{
+  from{transform:translateY(12px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
+}
+#pwa-banner.show{
+  display:flex;
+  animation:bannerUp .4s cubic-bezier(.76,0,.24,1) forwards;
+}
+.pwa-icon{
+  font-size:18px;flex-shrink:0;opacity:.6;
+}
+.pwa-text{flex:1;min-width:0;}
+.pwa-text strong{
+  display:block;
+  font-family:'Shippori Mincho',serif;
+  font-size:12px;letter-spacing:2px;
+  color:rgba(240,228,210,.7);margin-bottom:4px;
+}
+.pwa-text span{
+  font-size:10px;letter-spacing:1px;
+  color:rgba(255,255,255,.28);line-height:1.8;
+}
+.pwa-close{
+  background:none;border:none;
+  color:rgba(255,255,255,.2);font-size:14px;
+  cursor:pointer;padding:4px;flex-shrink:0;
+  touch-action:manipulation;transition:color .15s;
+}
+.pwa-close:active{color:rgba(255,255,255,.5);}
+@media (hover:hover) and (pointer:fine){
+  #pwa-banner{display:none!important;}
 }
 
-/* ジャンル別カラースキーム */
-.card[data-g="純文学"] .card-bg {
-  background: linear-gradient(160deg, #1a1614 0%, #2d2118 40%, #1a1614 100%);
-}
-.card[data-g="探偵・推理"] .card-bg {
-  background: linear-gradient(160deg, #0d1520 0%, #102035 40%, #0d1520 100%);
-}
-.card[data-g="怪談・怪異"] .card-bg {
-  background: linear-gradient(160deg, #120d1a 0%, #1e1228 40%, #120d1a 100%);
-}
-.card[data-g="恋愛・情念"] .card-bg {
-  background: linear-gradient(160deg, #1a0d10 0%, #2a1018 40%, #1a0d10 100%);
-}
-.card[data-g="歴史・時代"] .card-bg {
-  background: linear-gradient(160deg, #160f08 0%, #261808 40%, #160f08 100%);
-}
-.card[data-g="幻想・耽美"] .card-bg {
-  background: linear-gradient(160deg, #0d1a14 0%, #102614 40%, #0d1a14 100%);
-}
-.card[data-g="社会・風俗"] .card-bg {
-  background: linear-gradient(160deg, #101614 0%, #152018 40%, #101614 100%);
+/* ===== 小画面対応（iPhone SE: 375px以下） ===== */
+@media (max-width: 375px){
+  .action-author{font-size:12px;letter-spacing:1px;}
+  .action-title{font-size:9px;}
+  .action-btn{font-size:10px;padding:6px 10px;}
+  .action-icon-btn{width:36px;height:36px;min-width:36px;}
+  #btn-share{font-size:10px;padding:0 10px;height:36px;}
+  .card-top{padding:10px 14px 0;}
+  .genre-badge{font-size:10px;padding:2px 8px;}
+  .today-badge{font-size:8px;}
+  .card-text{font-size:clamp(15px,4vw,18px);}
+  .card-text-wrap{padding:16px 16px 80px;}
+  #header-ui{padding:10px 10px 0;}
+  #btn-filter,#btn-shelf-open{width:32px;height:32px;font-size:13px;}
+  .guide-title{font-size:21px;}
+  .guide-items{margin-bottom:24px;}
+  .guide-item{padding:11px 4px;}
 }
 
-/* ノイズ感 */
-.card-bg::after {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size: 200px;
-  opacity: .5;
-  pointer-events: none;
+.pc-nav{
+  display:none;
+  position:absolute;bottom:80px;z-index:350;
+  width:48px;height:80px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.10);
+  color:rgba(255,255,255,.35);
+  font-size:20px;cursor:pointer;
+  align-items:center;justify-content:center;
+  transition:background .2s,color .2s;
+  touch-action:manipulation;
+}
+.pc-nav:hover{background:rgba(255,255,255,.10);color:rgba(255,255,255,.7);}
+.pc-nav:active{background:rgba(255,255,255,.16);}
+#nav-prev{left:0;border-radius:0 4px 4px 0;border-left:none;}
+#nav-next{right:0;border-radius:4px 0 0 4px;border-right:none;}
+@media (hover:hover) and (pointer:fine){
+  .pc-nav{display:flex;}
 }
 
-/* ==============================
-   GENRE ACCENT LINE
-============================== */
-.card-accent {
-  position: absolute;
-  left: 0; right: 0; top: 0;
-  height: 2px;
-  z-index: 10;
+/* ===== HEADER ===== */
+#header-ui{position:absolute;top:0;right:0;z-index:300;display:flex;align-items:center;gap:6px;padding:14px 14px 0;}
+#btn-filter,#btn-shelf-open{
+  width:36px;height:36px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  border-radius:50%;color:rgba(255,255,255,.55);font-size:15px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;touch-action:manipulation;
 }
-.card[data-g="純文学"]    .card-accent { background: linear-gradient(90deg, #c4621a, #e8a04a, transparent); }
-.card[data-g="探偵・推理"] .card-accent { background: linear-gradient(90deg, #2a6090, #4a9cc8, transparent); }
-.card[data-g="怪談・怪異"] .card-accent { background: linear-gradient(90deg, #6a2090, #a050d0, transparent); }
-.card[data-g="恋愛・情念"] .card-accent { background: linear-gradient(90deg, #902040, #d04070, transparent); }
-.card[data-g="歴史・時代"] .card-accent { background: linear-gradient(90deg, #8a5010, #c88030, transparent); }
-.card[data-g="幻想・耽美"] .card-accent { background: linear-gradient(90deg, #1a7a40, #30b060, transparent); }
-.card[data-g="社会・風俗"] .card-accent { background: linear-gradient(90deg, #2a6a40, #40a060, transparent); }
+#btn-filter:active,#btn-shelf-open:active{background:rgba(255,255,255,.12);}
 
-/* ==============================
-   TOP META
-============================== */
-.card-top {
-  position: relative; z-index: 10;
-  padding: 52px 28px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-shrink: 0;
+#card-counter{
+  position:absolute;left:4px;top:calc(50% - 80px);
+  z-index:300;pointer-events:none;
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:9px;color:rgba(255,255,255,.22);letter-spacing:1px;white-space:nowrap;
+  writing-mode:vertical-rl;text-orientation:mixed;
 }
 
-.meta-genre {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+/* プログレスドット */
+#progress{position:absolute;left:8px;top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+.prog-dot{width:2px;height:2px;border-radius:1px;background:rgba(255,255,255,.18);transition:all .3s;}
+.prog-dot.on{height:18px;background:rgba(255,255,255,.45);}
 
-.genre-name {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  opacity: .45;
-}
-.card[data-g="純文学"]    .genre-name { color: #e8a04a; }
-.card[data-g="探偵・推理"] .genre-name { color: #4a9cc8; }
-.card[data-g="怪談・怪異"] .genre-name { color: #a050d0; }
-.card[data-g="恋愛・情念"] .genre-name { color: #d04070; }
-.card[data-g="歴史・時代"] .genre-name { color: #c88030; }
-.card[data-g="幻想・耽美"] .genre-name { color: #30b060; }
-.card[data-g="社会・風俗"] .genre-name { color: #40a060; }
 
-.pattern-name {
-  font-size: 9px;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,.2);
-}
-
-.meta-counter {
-  font-family: 'IM Fell English', serif;
-  font-style: italic;
-  font-size: 11px;
-  color: rgba(255,255,255,.18);
-  letter-spacing: 1px;
-}
-
-/* ==============================
-   MAIN TEXT AREA
-============================== */
-.card-text-wrap {
-  flex: 1;
-  position: relative;
-  z-index: 5;
-  padding-bottom: 70px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 24px 20px 20px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.card-text {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-family: 'Zen Old Mincho', 'Shippori Mincho', serif;
-  font-size: clamp(17px, 4.5vw, 22px);
-  line-height: 2.1;
-  letter-spacing: .12em;
-  color: rgba(240, 228, 210, .88);
-  /* 全文表示 */
-  height: auto;
-  overflow: visible;
-}
-
-/* ==============================
-   BOTTOM INFO
-============================== */
-.card-bottom { display: none; }
-
-.card-divider {
-  height: 1px;
-  margin-bottom: 16px;
-  opacity: .12;
-}
-.card[data-g="純文学"]    .card-divider { background: linear-gradient(90deg, #e8a04a, transparent); }
-.card[data-g="探偵・推理"] .card-divider { background: linear-gradient(90deg, #4a9cc8, transparent); }
-.card[data-g="怪談・怪異"] .card-divider { background: linear-gradient(90deg, #a050d0, transparent); }
-.card[data-g="恋愛・情念"] .card-divider { background: linear-gradient(90deg, #d04070, transparent); }
-.card[data-g="歴史・時代"] .card-divider { background: linear-gradient(90deg, #c88030, transparent); }
-.card[data-g="幻想・耽美"] .card-divider { background: linear-gradient(90deg, #30b060, transparent); }
-.card[data-g="社会・風俗"] .card-divider { background: linear-gradient(90deg, #40a060, transparent); }
-
-.card-author-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.author-info { flex: 1; min-width: 0; }
-.author-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: rgba(240,228,210,.82);
-  letter-spacing: 2px;
-  margin-bottom: 4px;
-}
-.work-title {
-  font-size: 11px;
-  color: rgba(240,228,210,.3);
-  letter-spacing: 1px;
-}
-
-.card-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.btn-src {
-  background: none;
-  border: 1px solid rgba(255,255,255,.1);
-  color: rgba(255,255,255,.3);
-  font-family: 'Shippori Mincho', serif;
-  font-size: 10px;
-  padding: 6px 12px;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  transition: all .2s;
-  letter-spacing: 1px;
-}
-.btn-src:active { background: rgba(255,255,255,.06); color: rgba(255,255,255,.6); }
-
-.btn-lend {
-  background: none;
-  border: 1px solid rgba(255,255,255,.15);
-  color: rgba(255,255,255,.4);
-  font-family: 'Shippori Mincho', serif;
-  font-size: 11px;
-  padding: 7px 16px;
-  cursor: pointer;
-  transition: all .2s;
-  letter-spacing: 1px;
-}
-.btn-lend:active { background: rgba(255,255,255,.08); }
-.btn-lend.is-lent {
-  background: rgba(200,100,40,.15);
-  border-color: rgba(200,120,40,.5);
-  color: #e8a04a;
-}
-
-/* ==============================
-   SWIPE HINT
-============================== */
-#swipe-hint {
-  position: absolute;
-  bottom: 48px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  pointer-events: none;
-  animation: hintOut 1s ease 2.5s forwards;
-}
-.hint-arrows {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  animation: hintBounce 1s ease infinite;
-}
-.hint-arr { font-size: 14px; color: rgba(255,255,255,.2); line-height: 1; }
-.hint-arr:first-child { opacity: .4; }
-.hint-txt { font-size: 8px; letter-spacing: 4px; color: rgba(255,255,255,.15); }
-
-@keyframes hintBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(4px); }
-}
-@keyframes hintOut {
-  to { opacity: 0; }
-}
-
-/* ==============================
-   FIXED UI
-============================== */
-/* フィルターボタン */
-#btn-filter {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 300;
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 50%;
-  color: rgba(255,255,255,.4);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .2s;
-  touch-action: manipulation;
-}
-#btn-filter:active { background: rgba(255,255,255,.12); }
-
-/* 書棚ボタン */
-#btn-shelf {
-  position: absolute;
-  top: 64px;
-  right: 20px;
-  z-index: 300;
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 50%;
-  color: rgba(255,255,255,.4);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .2s;
-  touch-action: manipulation;
-}
-#btn-shelf:active { background: rgba(255,255,255,.12); }
-.shelf-badge {
-  position: absolute;
-  top: -4px; right: -4px;
-  width: 16px; height: 16px;
-  background: #c4621a;
-  border-radius: 50%;
-  font-size: 9px;
-  color: #fff;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-family: sans-serif;
-}
-
-/* インジケーター */
-#progress {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  pointer-events: none;
-}
-.prog-dot {
-  width: 2px;
-  height: 2px;
-  border-radius: 1px;
-  background: rgba(255,255,255,.18);
-  transition: all .3s ease;
-}
-.prog-dot.on {
-  height: 18px;
-  background: rgba(255,255,255,.45);
-}
-
-/* ==============================
-   FILTER DRAWER
-============================== */
-#filter-drawer {
-  position: absolute;
-  inset: 0;
-  z-index: 400;
-  pointer-events: none;
-}
-#filter-drawer.open { pointer-events: all; }
-
-#filter-backdrop {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,.5);
-  opacity: 0;
-  transition: opacity .3s;
-}
-#filter-drawer.open #filter-backdrop { opacity: 1; }
-
-#filter-panel {
-  position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: min(280px, 80vw);
-  background: #111;
-  border-left: 1px solid rgba(255,255,255,.07);
-  padding: 60px 24px 40px;
-  transform: translateX(100%);
-  visibility: hidden;
-  transition: transform .35s var(--ease);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-#filter-drawer.open #filter-panel { transform: translateX(0); visibility: visible; }
-
-.filter-label {
-  font-size: 9px;
-  letter-spacing: 4px;
-  color: rgba(255,255,255,.2);
-  margin-bottom: 8px;
-}
-
-.f-item {
-  background: none;
-  border: none;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  color: rgba(255,255,255,.35);
-  font-family: 'Shippori Mincho', serif;
-  font-size: 14px;
-  padding: 12px 0;
-  cursor: pointer;
-  text-align: left;
-  letter-spacing: 2px;
-  transition: color .18s;
-  touch-action: manipulation;
-}
-.f-item:active, .f-item.on { color: rgba(255,255,255,.85); }
-.f-item.on::before {
-  content: '— ';
-  color: rgba(255,255,255,.3);
-}
-
-/* ==============================
-   SHELF：全画面リーダー
-============================== */
-#shelf-drawer {
-  position: absolute;
-  inset: 0;
-  z-index: 400;
-  pointer-events: none;
-}
-#shelf-drawer.open { pointer-events: all; }
-
-#shelf-panel {
-  position: absolute;
-  inset: 0;
-  background: #0d0d0d;
-  transform: translateY(100%);
-  transition: transform .4s var(--ease);
-  display: flex; flex-direction: column;
-  overflow: hidden;
-}
-#shelf-drawer.open #shelf-panel { transform: translateY(0); }
-
-.shelf-hd {
-  padding: 52px 24px 16px;
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  flex-shrink: 0;
-}
-.shelf-ttl {
-  font-size: 11px; letter-spacing: 4px;
-  color: rgba(255,255,255,.3);
-}
-.shelf-close {
-  background: none; border: none;
-  color: rgba(255,255,255,.25); font-size: 18px; cursor: pointer;
-  touch-action: manipulation; padding: 4px;
-}
-
-/* 書棚：作品リスト ↔ 全文ビュー の2画面 */
-#shelf-list-view, #shelf-reader-view {
-  flex: 1; overflow: hidden; display: flex; flex-direction: column;
-}
-#shelf-reader-view { display: none; }
-
-.shelf-bd { overflow-y: auto; padding: 8px 24px 40px; flex: 1; }
-.shelf-empty {
-  text-align: center;
-  color: rgba(255,255,255,.15);
-  font-size: 11px; letter-spacing: 2px;
-  padding: 52px 0; line-height: 3;
-}
-
-/* リストアイテム */
-.s-item {
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(255,255,255,.04);
-  display: flex; align-items: center; gap: 14px;
-  cursor: pointer;
-}
-.s-item:active { background: rgba(255,255,255,.02); }
-.s-info { flex: 1; min-width: 0; }
-.s-ttl {
-  font-size: 14px; color: rgba(255,255,255,.65);
-  margin-bottom: 4px; letter-spacing: 1px;
-}
-.s-auth { font-size: 10px; color: rgba(255,255,255,.2); letter-spacing: 1px; }
-.s-arrow { color: rgba(255,255,255,.15); font-size: 14px; flex-shrink: 0; }
-
-/* リーダービュー */
-.reader-hd {
-  padding: 16px 24px 12px;
-  display: flex; align-items: center; gap: 12px;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  flex-shrink: 0;
-}
-.reader-back {
-  background: none; border: none;
-  color: rgba(255,255,255,.3); font-size: 16px;
-  cursor: pointer; touch-action: manipulation;
-  padding: 4px 8px 4px 0;
-}
-.reader-meta { flex: 1; }
-.reader-title { font-size: 13px; color: rgba(255,255,255,.6); letter-spacing: 1px; }
-.reader-author { font-size: 10px; color: rgba(255,255,255,.25); letter-spacing: 1px; margin-top: 2px; }
-.reader-acts { display: flex; gap: 8px; flex-shrink: 0; }
-.reader-src {
-  background: none; border: 1px solid rgba(255,255,255,.1);
-  color: rgba(255,255,255,.3); font-family: 'Shippori Mincho', serif;
-  font-size: 9px; padding: 4px 10px; cursor: pointer;
-  text-decoration: none; display: inline-block; letter-spacing: 1px;
-  touch-action: manipulation;
-}
-.reader-ret {
-  background: none; border: 1px solid rgba(200,100,40,.3);
-  color: rgba(200,120,40,.6); font-family: 'Shippori Mincho', serif;
-  font-size: 9px; padding: 4px 10px; cursor: pointer;
-  touch-action: manipulation; letter-spacing: 1px;
-}
-
-.reader-body {
-  flex: 1; overflow-y: auto; overflow-x: hidden;
-  padding: 24px 20px 40px;
-  -webkit-overflow-scrolling: touch;
-}
-.reader-text {
-  writing-mode: vertical-rl;
-  font-family: 'Zen Old Mincho', 'Shippori Mincho', serif;
-  font-size: 17px; line-height: 2.1; letter-spacing: .1em;
-  color: rgba(240,228,210,.78);
-  height: 100%;
-  min-height: calc(100vw - 40px);
-}
-
-#bg-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s ease,background .4s ease;}
-#bg-overlay.active{opacity:1;}
-body[data-genre="純文学"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(196,98,26,.3) 0%,transparent 65%);}
-body[data-genre="探偵・推理"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,96,160,.3) 0%,transparent 65%);}
-body[data-genre="怪談・怪異"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(120,32,160,.3) 0%,transparent 65%);}
-body[data-genre="恋愛・情念"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(160,32,64,.3) 0%,transparent 65%);}
-body[data-genre="歴史・時代"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(140,80,16,.3) 0%,transparent 65%);}
-body[data-genre="幻想・耽美"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(26,130,64,.3) 0%,transparent 65%);}
-body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,110,64,.3) 0%,transparent 65%);}
-@keyframes swipeHint{0%{transform:translateY(0)}25%{transform:translateY(-22px)}50%{transform:translateY(0)}75%{transform:translateY(-12px)}100%{transform:translateY(0)}}
-.swipe-hint{animation:swipeHint 1.4s ease 1s 1 forwards;}
 #swipe-indicator{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;opacity:0;animation:swipeIndAnim 3s ease 1.5s 1 forwards;}
 @keyframes swipeIndAnim{0%{opacity:0;transform:translateX(-50%) translateY(0)}20%{opacity:.7}75%{opacity:.7;transform:translateX(-50%) translateY(-14px)}100%{opacity:0;transform:translateX(-50%) translateY(-22px)}}
 .swipe-ind-line{width:1px;height:28px;background:linear-gradient(to top,rgba(240,228,210,.6),transparent);}
 .swipe-ind-text{font-size:8px;letter-spacing:3px;color:rgba(240,228,210,.4);}
-#action-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:400;background:linear-gradient(to top,rgba(5,5,5,.95) 0%,rgba(5,5,5,.5) 70%,transparent 100%);pointer-events:none;}
-.action-bar-inner{display:flex;align-items:center;padding:8px 16px 6px;gap:12px;pointer-events:all;}
-.action-info{flex:1;min-width:0;}
-.action-author{font-size:13px;font-weight:700;color:rgba(240,228,210,.85);letter-spacing:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.action-title{font-size:10px;color:rgba(240,228,210,.38);letter-spacing:1px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.action-btn{flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);font-family:'Shippori Mincho',serif;font-size:11px;padding:9px 16px;cursor:pointer;letter-spacing:1px;touch-action:manipulation;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap;transition:background .2s;-webkit-tap-highlight-color:transparent;}
-.action-btn:active{background:rgba(255,255,255,.18);}
-.action-shelf-btn{flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);font-size:20px;width:44px;height:44px;min-width:44px;cursor:pointer;touch-action:manipulation;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;transition:background .2s;-webkit-tap-highlight-color:transparent;}
-.action-shelf-btn.has-items{border-color:rgba(196,98,26,.6);color:rgba(240,160,74,.9);}
-.action-badge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;background:#c4621a;border-radius:8px;font-size:9px;color:#fff;display:none;align-items:center;justify-content:center;font-family:sans-serif;padding:0 3px;}
+
+
+/* ===== 周辺光アニメーション（文章エリアを避ける） ===== */
+#grad-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+  overflow: hidden;
+  isolation: isolate;
+}
+#grad-bg.active { opacity: 1; }
+
+/* 光の玉：四隅・端に配置してテキスト中央を避ける */
+#grad-bg::before,
+#grad-bg::after,
+#grad-bg .aurora-mid {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px); /* 大きくぼかして輪郭を消す */
+  will-change: transform, opacity;
+}
+
+/* レイヤー1：左上隅からじわっと */
+#grad-bg::before {
+  width: 70%; height: 50%;
+  top: -20%; left: -25%;
+  animation: vignette1 25s ease-in-out infinite;
+  opacity: 0;
+}
+/* レイヤー2：右下隅からじわっと */
+#grad-bg::after {
+  width: 65%; height: 45%;
+  bottom: -15%; right: -20%;
+  top: auto; left: auto;
+  animation: vignette2 30s ease-in-out infinite 6s;
+  opacity: 0;
+}
+/* レイヤー3：右上隅・極めて薄く */
+#grad-bg .aurora-mid {
+  width: 55%; height: 40%;
+  top: -10%; right: -15%;
+  left: auto;
+  animation: vignette3 20s ease-in-out infinite 12s;
+  opacity: 0;
+}
+
+@keyframes vignette1 {
+  0%   { transform: translate(0%,   0%)  scale(1);    opacity: 0.10; }
+  40%  { transform: translate(5%,   8%)  scale(1.1);  opacity: 0.16; }
+  70%  { transform: translate(-3%,  4%)  scale(0.95); opacity: 0.12; }
+  100% { transform: translate(0%,   0%)  scale(1);    opacity: 0.10; }
+}
+@keyframes vignette2 {
+  0%   { transform: translate(0%,   0%)  scale(1);    opacity: 0.08; }
+  35%  { transform: translate(-6%, -5%)  scale(1.08); opacity: 0.14; }
+  65%  { transform: translate(4%,   3%)  scale(0.92); opacity: 0.10; }
+  100% { transform: translate(0%,   0%)  scale(1);    opacity: 0.08; }
+}
+@keyframes vignette3 {
+  0%   { transform: translate(0%,  0%)   scale(1);    opacity: 0.06; }
+  50%  { transform: translate(-4%, 6%)   scale(1.05); opacity: 0.11; }
+  100% { transform: translate(0%,  0%)   scale(1);    opacity: 0.06; }
+}
+
+/* ジャンル別カラー */
+#app[data-genre="純文学"]    #grad-bg::before    { background: radial-gradient(ellipse, #c4621a 0%, transparent 65%); }
+#app[data-genre="純文学"]    #grad-bg::after     { background: radial-gradient(ellipse, #8a3a0a 0%, transparent 65%); }
+#app[data-genre="純文学"]    #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #e8a04a 0%, transparent 65%); }
+
+#app[data-genre="探偵・推理"] #grad-bg::before    { background: radial-gradient(ellipse, #1a4a8a 0%, transparent 65%); }
+#app[data-genre="探偵・推理"] #grad-bg::after     { background: radial-gradient(ellipse, #0a2a5a 0%, transparent 65%); }
+#app[data-genre="探偵・推理"] #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #4a9cc8 0%, transparent 65%); }
+
+#app[data-genre="怪談・怪異"] #grad-bg::before    { background: radial-gradient(ellipse, #5a1080 0%, transparent 65%); }
+#app[data-genre="怪談・怪異"] #grad-bg::after     { background: radial-gradient(ellipse, #2a0850 0%, transparent 65%); }
+#app[data-genre="怪談・怪異"] #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #8040b0 0%, transparent 65%); }
+
+#app[data-genre="恋愛・情念"] #grad-bg::before    { background: radial-gradient(ellipse, #7a1030 0%, transparent 65%); }
+#app[data-genre="恋愛・情念"] #grad-bg::after     { background: radial-gradient(ellipse, #4a0818 0%, transparent 65%); }
+#app[data-genre="恋愛・情念"] #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #b03060 0%, transparent 65%); }
+
+
+#app[data-genre="幻想・耽美"] #grad-bg::before    { background: radial-gradient(ellipse, #085820 0%, transparent 65%); }
+#app[data-genre="幻想・耽美"] #grad-bg::after     { background: radial-gradient(ellipse, #043a14 0%, transparent 65%); }
+#app[data-genre="幻想・耽美"] #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #208040 0%, transparent 65%); }
+
+#app[data-genre="社会・風俗"] #grad-bg::before    { background: radial-gradient(ellipse, #064a18 0%, transparent 65%); }
+#app[data-genre="社会・風俗"] #grad-bg::after     { background: radial-gradient(ellipse, #043010 0%, transparent 65%); }
+#app[data-genre="社会・風俗"] #grad-bg .aurora-mid{ background: radial-gradient(ellipse, #187030 0%, transparent 65%); }
+
+/* bg-overlay */
+#bg-overlay{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s,background .4s;}
+#bg-overlay.active{opacity:1;}
+#app[data-genre="純文学"]    #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(196,98,26,.35) 0%,transparent 65%);}
+#app[data-genre="探偵・推理"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,96,160,.35) 0%,transparent 65%);}
+#app[data-genre="怪談・怪異"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(120,32,160,.35) 0%,transparent 65%);}
+#app[data-genre="恋愛・情念"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(160,32,64,.35) 0%,transparent 65%);}
+#app[data-genre="幻想・耽美"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(26,130,64,.35) 0%,transparent 65%);}
+#app[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,110,64,.35) 0%,transparent 65%);}
+
+/* ===== FILTER DRAWER ===== */
+#filter-drawer{position:absolute;inset:0;z-index:500;pointer-events:none;}
+#filter-drawer.open{pointer-events:all;}
+#filter-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .3s;}
+#filter-drawer.open #filter-backdrop{opacity:1;}
+#filter-panel{
+  position:absolute;top:0;right:0;bottom:0;width:min(288px,82vw);
+  background:linear-gradient(180deg,#0e0c0a 0%,#0a0908 100%);
+  border-left:1px solid rgba(255,255,255,.06);
+  padding:0;transform:translateX(100%);visibility:hidden;
+  transition:transform .38s var(--ease);display:flex;flex-direction:column;overflow:hidden;
+}
+#filter-drawer.open #filter-panel{transform:translateX(0);visibility:visible;}
+
+/* パネルヘッダー */
+#filter-panel-hd{
+  padding:52px 24px 20px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  flex-shrink:0;position:relative;
+}
+#filter-panel-hd::after{
+  content:'';position:absolute;bottom:0;left:24px;right:24px;height:1px;
+  background:linear-gradient(90deg,rgba(255,255,255,.08),transparent);
+}
+#filter-panel-hd-title{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;letter-spacing:4px;color:rgba(255,255,255,.2);
+}
+#filter-panel-hd-credit{
+  font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.15);
+  margin-top:6px;text-decoration:none;display:block;
+}
+#filter-panel-hd-credit:hover{color:rgba(255,255,255,.35);}
+#filter-panel-footer-copy{
+  font-size:9px;letter-spacing:.5px;color:rgba(255,255,255,.12);
+  margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);
+  text-align:center;
+}
+#filter-panel-footer-copy a{color:rgba(255,255,255,.2);text-decoration:none;}
+#filter-panel-footer-copy a:hover{color:rgba(255,255,255,.4);}
+
+/* スクロールエリア */
+#filter-scroll{flex:1;overflow-y:auto;padding:20px 24px 40px;display:flex;flex-direction:column;gap:0;}
+
+.filter-label{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:9px;letter-spacing:4px;color:rgba(255,255,255,.2);
+  margin:20px 0 8px;padding-bottom:6px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.filter-label:first-child{margin-top:0;}
+
+.f-item{
+  background:none;border:none;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  color:rgba(255,255,255,.32);font-family:'Shippori Mincho',serif;
+  font-size:14px;padding:13px 0 13px 2px;cursor:pointer;text-align:left;
+  letter-spacing:2px;transition:color .18s,padding-left .18s;touch-action:manipulation;
+  position:relative;
+}
+.f-item:active{color:rgba(255,255,255,.7);}
+.f-item.on{color:rgba(255,255,255,.88);padding-left:14px;}
+.f-item.on::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:4px;height:16px;background:currentColor;opacity:.5;
+}
+/* 日替わり冒頭は特別カラー */
+#f-today{color:rgba(240,160,74,.5);}
+#f-today.on{color:rgba(240,160,74,.9);}
+
+.author-pill{
+  font-family:'Shippori Mincho',serif;font-size:11px;letter-spacing:1px;
+  color:rgba(255,255,255,.3);background:transparent;
+  border:1px solid rgba(255,255,255,.07);padding:5px 11px;
+  cursor:pointer;transition:all .15s;touch-action:manipulation;white-space:nowrap;
+}
+.author-pill:active,.author-pill.on{
+  color:rgba(240,228,210,.85);border-color:rgba(255,255,255,.25);
+  background:rgba(255,255,255,.05);
+}
+
+/* HOW TO USE */
+.filter-howto-item{
+  font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1px;
+  line-height:1;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03);
+  display:flex;align-items:center;gap:10px;
+}
+.filter-howto-icon{width:20px;text-align:center;flex-shrink:0;font-size:13px;opacity:.6;}
+
+
+
+/* ===== SHELF DRAWER ===== */
+#shelf-drawer{position:absolute;inset:0;z-index:500;pointer-events:none;}
+#shelf-drawer.open{pointer-events:all;}
+#shelf-panel{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#0c0a08 0%,#090807 100%);
+  transform:translateY(100%);transition:transform .4s var(--ease);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#shelf-drawer.open #shelf-panel{transform:translateY(0);}
+.shelf-hd{
+  padding:52px 24px 18px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  flex-shrink:0;position:relative;
+}
+.shelf-hd::after{
+  content:'';position:absolute;bottom:0;left:24px;right:24px;height:1px;
+  background:linear-gradient(90deg,rgba(255,255,255,.07),transparent);
+}
+.shelf-ttl{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:18px;letter-spacing:3px;color:rgba(240,228,210,.55);
+}
+.shelf-ttl-sub{
+  font-family:'Shippori Mincho',serif;
+  font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.18);
+  margin-top:4px;
+}
+.shelf-close{
+  background:none;border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.2);font-size:12px;
+  width:30px;height:30px;cursor:pointer;
+  touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;letter-spacing:0;
+}
+.shelf-close:active{background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);}
+#shelf-list-view,#shelf-reader-view{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+#shelf-reader-view{display:none;}
+.shelf-bd{overflow-y:auto;padding:4px 24px 48px;flex:1;}
+.shelf-empty{
+  text-align:center;padding:64px 0;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.shelf-empty-icon{font-size:28px;opacity:.2;}
+.shelf-empty-text{
+  font-family:'Shippori Mincho',serif;
+  color:rgba(255,255,255,.18);font-size:12px;letter-spacing:2px;line-height:2.4;
+}
+.s-item{
+  padding:16px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:background .15s;
+}
+.s-item:active{background:rgba(255,255,255,.02);}
+.s-info{flex:1;min-width:0;}
+.s-ttl{
+  font-family:'Shippori Mincho',serif;
+  font-size:14px;color:rgba(240,228,210,.7);
+  margin-bottom:4px;letter-spacing:1px;
+}
+.s-auth{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;color:rgba(255,255,255,.25);letter-spacing:1px;
+}
+.s-arrow{color:rgba(255,255,255,.12);font-size:12px;flex-shrink:0;}
+
+/* リーダー */
+.reader-hd{
+  padding:16px 24px 14px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  flex-shrink:0;
+}
+.reader-back{
+  background:none;border:none;
+  color:rgba(255,255,255,.25);font-size:18px;
+  cursor:pointer;touch-action:manipulation;padding:4px 10px 4px 0;
+  transition:color .15s;
+}
+.reader-back:active{color:rgba(255,255,255,.6);}
+.reader-meta{flex:1;}
+.reader-title{
+  font-family:'Shippori Mincho',serif;
+  font-size:14px;color:rgba(240,228,210,.75);letter-spacing:1px;
+}
+.reader-author{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:3px;
+}
+.reader-acts{display:flex;gap:8px;flex-shrink:0;}
+.reader-src{
+  background:none;border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.35);font-family:'Shippori Mincho',serif;
+  font-size:11px;padding:7px 13px;cursor:pointer;text-decoration:none;
+  display:inline-block;letter-spacing:1px;touch-action:manipulation;
+  transition:all .15s;
+}
+.reader-src:active{background:rgba(255,255,255,.05);}
+.reader-ret{
+  background:none;border:1px solid rgba(200,80,40,.3);
+  color:rgba(200,100,60,.6);font-family:'Shippori Mincho',serif;
+  font-size:11px;padding:7px 13px;cursor:pointer;touch-action:manipulation;
+  letter-spacing:1px;transition:all .15s;
+}
+.reader-ret:active{background:rgba(200,80,40,.08);}
+.reader-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:28px 20px 48px;-webkit-overflow-scrolling:touch;display:flex;justify-content:flex-end;}
+.reader-text{writing-mode:vertical-rl;font-family:'Zen Old Mincho','Shippori Mincho',serif;font-size:17px;line-height:2.1;letter-spacing:.1em;color:rgba(240,228,210,.82);min-height:100%;}
+
+/* ===== 使い方ガイド ===== */
+#guide-overlay{
+  position:absolute;inset:0;z-index:800;
+  background:radial-gradient(ellipse at 50% 30%, #0f0c0a 0%, #050403 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 36px;opacity:0;pointer-events:none;
+  transition:opacity .6s ease;
+  overflow:hidden;
+}
+/* 背景の縦線装飾 */
+#guide-overlay::before{
+  content:'';position:absolute;
+  top:0;bottom:0;left:50%;transform:translateX(-50%);
+  width:1px;
+  background:linear-gradient(to bottom,transparent 0%,rgba(255,255,255,.04) 20%,rgba(255,255,255,.04) 80%,transparent 100%);
+  pointer-events:none;
+}
+#guide-overlay.show{opacity:1;pointer-events:all;}
+
+/* トップ装飾 */
+.guide-ornament{
+  margin-bottom:14px;
+  opacity:.35;
+}
+.guide-title{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:26px;letter-spacing:4px;color:rgba(240,228,210,.7);
+  margin-bottom:5px;
+  text-shadow:0 0 60px rgba(240,160,74,.12);
+}
+.guide-title-sub{
+  font-family:'Shippori Mincho',serif;
+  font-size:9px;letter-spacing:6px;color:rgba(255,255,255,.14);
+  margin-bottom:28px;
+}
+/* 二重罫線装飾 */
+.guide-rule{
+  position:relative;
+  width:120px;height:9px;
+  margin-bottom:28px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+}
+.guide-rule::before,.guide-rule::after{
+  content:'';display:block;
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+}
+.guide-rule-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+}
+
+/* アイテムリスト */
+.guide-items{
+  width:100%;max-width:340px;
+  display:flex;flex-direction:column;
+  margin-bottom:32px;
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.guide-item{
+  display:flex;align-items:flex-start;gap:18px;
+  padding:14px 4px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  position:relative;
+}
+/* 選択インジケーター */
+.guide-item::before{
+  content:'';
+  position:absolute;left:-4px;top:50%;transform:translateY(-50%);
+  width:2px;height:0;
+  background:rgba(240,160,74,.4);
+  transition:height .3s ease;
+}
+#guide-overlay.show .guide-item::before{
+  height:60%;
+  transition-delay:calc(var(--i) * .08s + .3s);
+}
+.guide-item:nth-child(1){--i:0;}
+.guide-item:nth-child(2){--i:1;}
+.guide-item:nth-child(3){--i:2;}
+.guide-item:nth-child(4){--i:3;}
+
+.guide-arrow{
+  width:32px;height:32px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  font-size:14px;color:rgba(255,255,255,.4);
+  margin-top:2px;
+}
+.guide-desc{font-size:12px;color:rgba(255,255,255,.32);letter-spacing:1px;line-height:1.7;}
+.guide-desc strong{
+  color:rgba(240,228,210,.8);display:block;
+  font-size:13px;margin-bottom:3px;letter-spacing:1px;
+  font-family:'Shippori Mincho',serif;
+}
+
+/* はじめるボタン */
+.guide-env{
+  font-size:10px;letter-spacing:1px;color:rgba(240,228,210,.25);
+  text-align:center;margin-bottom:16px;
+}
+.guide-close{
+  background:rgba(240,228,210,.1);
+  border:1px solid rgba(240,228,210,.3);
+  color:rgba(240,228,210,.9);
+  font-family:'Shippori Mincho',serif;
+  font-size:13px;letter-spacing:6px;
+  padding:16px 56px;cursor:pointer;
+  touch-action:manipulation;
+  transition:all .25s;
+  position:relative;
+  margin-top:4px;
+}
+.guide-close::before,.guide-close::after{
+  content:'';position:absolute;top:50%;
+  width:16px;height:1px;
+  background:rgba(240,228,210,.3);
+}
+.guide-close::before{right:calc(100% + 10px);transform:translateY(-50%);}
+.guide-close::after{left:calc(100% + 10px);transform:translateY(-50%);}
+.guide-close:active{
+  background:rgba(240,228,210,.18);
+  border-color:rgba(240,228,210,.5);
+  color:#fff;
+}
+
+.guide-note-link{
+  margin-top:20px;
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:10px;letter-spacing:2px;
+  color:rgba(255,255,255,.14);text-decoration:none;
+}
+
+/* ===== iPhone SE など小画面対応 (〜375px) ===== */
+@media (max-width: 375px){
+  /* アクションバーをコンパクトに */
+  .action-bar-inner{padding:6px 10px 14px;gap:6px;}
+  .action-author{font-size:12px;}
+  .action-btn{font-size:9px;padding:6px 9px;}
+  .action-icon-btn{width:36px;height:36px;min-width:36px;}
+  #btn-heart svg{width:17px;height:17px;}
+
+  /* カードテキストを少し小さく */
+  .card-text{font-size:clamp(15px,4vw,18px);}
+
+  /* ヘッダーボタン */
+  #btn-filter,#btn-shelf-open{width:32px;height:32px;font-size:13px;}
+  #header-ui{gap:4px;padding:12px 10px 0;}
+
+  /* ガイドのパディング */
+  #guide-overlay{padding:0 24px;}
+  .guide-title{font-size:20px;}
+  .guide-items{margin-bottom:24px;}
+  .guide-item{padding:11px 4px;gap:14px;}
+  .guide-desc{font-size:11px;}
+  .guide-desc strong{font-size:12px;}
+
+  /* 書棚ヘッダー */
+  .shelf-ttl{font-size:16px;}
+  .shelf-hd{padding:44px 20px 16px;}
+
+  /* フィルターパネル */
+  #filter-panel-hd{padding:44px 20px 16px;}
+  #filter-scroll{padding:16px 20px 32px;}
+}
+#share-overlay{
+  position:absolute;inset:0;z-index:700;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.8);padding:24px;
+}
+#share-overlay.show{display:flex;}
+#share-card{
+  background:#0e0c0a;width:100%;max-width:340px;
+  padding:28px 48px 24px 24px;border:1px solid rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.share-accent-line{height:1px;margin-bottom:20px;}
+.share-first-sentence{
+  writing-mode:vertical-rl;font-family:'Shippori Mincho','Zen Old Mincho',serif;
+  font-size:18px;line-height:2.0;letter-spacing:.12em;
+  color:rgba(240,228,210,.95);
+  max-height:220px;overflow:visible;
+  align-self:flex-end;display:block;margin:0 auto 20px;
+  text-orientation:mixed;
+  padding-right:8px;
+}
+.share-meta-row{display:flex;justify-content:space-between;align-items:flex-end;}
+.share-author-block{}
+.share-author{font-size:14px;font-weight:700;color:rgba(240,228,210,.75);letter-spacing:2px;}
+.share-work{font-size:10px;color:rgba(240,228,210,.35);letter-spacing:1px;margin-top:2px;}
+.share-app{font-family:'IM Fell English',serif;font-style:italic;font-size:11px;color:rgba(255,255,255,.2);letter-spacing:1px;text-align:right;line-height:2;}
+.share-actions{display:flex;gap:8px;margin-top:16px;}
+.share-actions button,.share-actions a{
+  flex:1;padding:11px 0;font-family:'Shippori Mincho',serif;
+  font-size:11px;letter-spacing:2px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.15);
+  text-align:center;text-decoration:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;touch-action:manipulation;
+}
+#share-img-btn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);}
+#share-img-btn:active{background:rgba(255,255,255,.18);}
+#share-x-btn{background:#000;color:#fff;border-color:rgba(255,255,255,.3);}
+#share-x-btn:active{background:#1a1a1a;}
+#share-close-btn{background:none;color:rgba(255,255,255,.3);flex:0.6;}
+#share-close-btn:active{background:rgba(255,255,255,.06);}
 </style>
 </head>
 <body>
 
-<div id="bg-overlay"></div>
 <div id="app">
+
+<div id="bg-overlay"></div>
+<div id="grad-bg"><div class="aurora-mid"></div></div>
+
+
 <div id="deck"></div>
 
-<!-- スワイプヒント -->
-<div id="swipe-hint">
-  <div class="hint-arrows">
-    <div class="hint-arr">↑</div>
-    <div class="hint-arr">↓</div>
-  </div>
-  <div class="hint-txt">SWIPE</div>
+<!-- PC ナビ矢印 -->
+<button class="pc-nav" id="nav-prev" aria-label="前へ">↑</button>
+<button class="pc-nav" id="nav-next" aria-label="次へ">↓</button>
+
+<!-- ヘッダー右上：📚と≡の2つだけ -->
+<div id="header-ui">
+  <button id="btn-shelf-open" aria-label="書棚を開く" title="書棚" style="position:relative;">📚<span id="shelf-header-badge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;background:#c4621a;border-radius:8px;font-size:9px;color:#fff;align-items:center;justify-content:center;font-family:sans-serif;padding:0 3px;"></span></button>
+  <button id="btn-filter" aria-label="メニュー">≡</button>
 </div>
 
-<!-- フィルターボタン -->
-<button id="btn-filter">≡</button>
+<!-- カウンター中央上 -->
+<div id="card-counter"></div>
 
-<!-- インジケーター -->
+<!-- プログレスドット -->
 <div id="progress"></div>
 
-<div id="swipe-indicator"><div class="swipe-ind-line"></div><div class="swipe-ind-text">SWIPE</div></div>
+<!-- スワイプ/スクロールインジケーター -->
+<div id="swipe-indicator"><div class="swipe-ind-line"></div><div class="swipe-ind-text" id="swipe-ind-text">SWIPE</div></div>
 
-<div id="action-bar"><div class="action-bar-inner"><div class="action-info"><div class="action-author" id="action-author"></div><div class="action-title" id="action-title"></div></div><a class="action-btn" id="action-src" href="#" target="_blank" rel="noopener">原文</a><button class="action-shelf-btn" id="btn-shelf">📚<span class="action-badge" id="shelf-badge"></span></button></div></div>
+<!-- 保存トースト -->
+<div id="saved-toast">保存しました</div>
+
+<!-- PWAインストール訴求バナー -->
+<div id="pwa-banner">
+  <div class="pwa-icon">📖</div>
+  <div class="pwa-text">
+    <strong>ホーム画面に追加する</strong>
+    <span>アプリとして毎日開けます<br>iOS: 共有 → ホーム画面に追加<br>Android: メニュー → アプリをインストール</span>
+  </div>
+  <button class="pwa-close" id="pwa-close">✕</button>
+</div>
+
+<!-- アクションバー -->
+<div id="action-bar">
+  <div class="action-bar-inner">
+    <div class="action-info">
+      <div class="action-author" id="action-author"></div>
+      <div class="action-title" id="action-title"></div>
+    </div>
+    <div class="action-btns">
+      <a class="action-btn" id="action-src" href="#" target="_blank" rel="noopener">原文</a>
+      <button id="btn-share" aria-label="シェア" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65);font-family:'Shippori Mincho',serif;font-size:11px;letter-spacing:2px;padding:0 14px;height:38px;cursor:pointer;touch-action:manipulation;white-space:nowrap;transition:background .2s;-webkit-tap-highlight-color:transparent;flex-shrink:0;">シェア</button>
+      <button class="action-icon-btn" id="btn-heart" aria-label="好きな冒頭に追加">
+        <svg id="heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- フィルタードロワー -->
 <div id="filter-drawer">
   <div id="filter-backdrop"></div>
   <div id="filter-panel">
-    <div class="filter-label">GENRE</div>
-    <button class="f-item on" data-f="all">すべて</button>
-    <button class="f-item" data-f="純文学">純文学</button>
-    <button class="f-item" data-f="探偵・推理">探偵・推理</button>
-    <button class="f-item" data-f="怪談・怪異">怪談・怪異</button>
-    <button class="f-item" data-f="恋愛・情念">恋愛・情念</button>
-    <button class="f-item" data-f="歴史・時代">歴史・時代</button>
-    <button class="f-item" data-f="幻想・耽美">幻想・耽美</button>
-    <button class="f-item" data-f="社会・風俗">社会・風俗</button>
+    <div id="filter-panel-hd">
+      <div id="filter-panel-hd-title">— 冒頭収集館 —</div>
+      <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" id="filter-panel-hd-credit">created by @memetomamoru</a>
+
+    </div>
+    <div id="filter-scroll">
+      <div class="filter-label">GENRE</div>
+      <button class="f-item" data-f="today" id="f-today">日替わり冒頭</button>
+      <button class="f-item on" data-f="all">すべて</button>
+      <button class="f-item" data-f="純文学">純文学</button>
+      <button class="f-item" data-f="探偵・推理">探偵・推理</button>
+      <button class="f-item" data-f="怪談・怪異">怪談・怪異</button>
+      <button class="f-item" data-f="恋愛・情念">恋愛・情念</button>
+      <button class="f-item" data-f="幻想・耽美">幻想・耽美</button>
+      <button class="f-item" data-f="社会・風俗">社会・風俗</button>
+      <div class="filter-label">AUTHORS</div>
+      <div id="author-list" style="display:flex;flex-wrap:wrap;gap:6px;padding-bottom:4px;"></div>
+      <div class="filter-label">HOW TO USE</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">↕</span>スワイプ・ホイール・キーで切替</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">❤</span>ハートで書棚に保存</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">📚</span>書棚で保存作品を確認</div>
+      <div class="filter-howto-item"><span class="filter-howto-icon">↑</span>シェアで画像・Xに投稿</div>
+      <div id="filter-panel-footer-copy">© <span id="copy-year"></span> memetomamoru｜テキスト提供：<a href="https://www.aozora.gr.jp/" target="_blank" rel="noopener">青空文庫</a>｜<a href="/privacy.html">プライバシーポリシー</a></div>
+
+    </div>
   </div>
 </div>
 
-<!-- 書棚：全画面リーダー -->
+<!-- 書棚 -->
 <div id="shelf-drawer">
   <div id="shelf-panel">
-    <!-- リストビュー -->
     <div id="shelf-list-view">
       <div class="shelf-hd">
-        <span class="shelf-ttl">私の書棚</span>
+        <div>
+          <div class="shelf-ttl">私の書棚</div>
+          <div class="shelf-ttl-sub">保存した冒頭</div>
+        </div>
         <button class="shelf-close" id="shelf-close">✕</button>
       </div>
       <div class="shelf-bd" id="shelf-bd"></div>
     </div>
-    <!-- リーダービュー -->
     <div id="shelf-reader-view">
       <div class="reader-hd">
         <button class="reader-back" id="reader-back">←</button>
@@ -683,7 +991,7 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
         </div>
         <div class="reader-acts">
           <a class="reader-src" id="reader-src" target="_blank" rel="noopener">原文</a>
-          <button class="reader-ret" id="reader-ret">返却</button>
+          <button class="reader-ret" id="reader-ret">削除</button>
         </div>
       </div>
       <div class="reader-body">
@@ -693,55 +1001,211 @@ body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellips
   </div>
 </div>
 
+<!-- シェアモーダル -->
+<div id="share-overlay">
+  <div style="width:100%;max-width:340px;">
+    <div id="share-card">
+      <div class="share-accent-line" id="share-accent-line"></div>
+      <div class="share-first-sentence" id="share-sentence"></div>
+      <div class="share-meta-row">
+        <div class="share-author-block">
+          <div class="share-author" id="share-author"></div>
+          <div class="share-work" id="share-work"></div>
+        </div>
+        <div class="share-app">冒頭収集館</div>
+      </div>
+    </div>
+    <!-- 一言コメント -->
+    <textarea id="share-comment" placeholder="一言添えてシェア（任意）" maxlength="80"
+      style="width:100%;margin-top:10px;padding:10px 12px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+      color:rgba(255,255,255,.7);font-family:'Shippori Mincho',serif;
+      font-size:12px;letter-spacing:1px;resize:none;height:52px;
+      line-height:1.6;outline:none;-webkit-appearance:none;"></textarea>
+    <div class="share-actions">
+      <button id="share-img-btn">画像保存</button>
+      <button id="share-x-btn">𝕏 シェア</button>
+      <button id="share-close-btn">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- 使い方ガイド（初回のみ） -->
+<div id="guide-overlay">
+  <div class="guide-ornament">
+    <svg width="32" height="38" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- 本の表紙 -->
+      <rect x="5" y="1" width="24" height="36" rx="2" stroke="rgba(240,228,210,.7)" stroke-width="1.2" fill="none"/>
+      <!-- 背表紙 -->
+      <rect x="1" y="1" width="6" height="36" rx="1.5" stroke="rgba(240,228,210,.5)" stroke-width="1.2" fill="rgba(240,228,210,.04)"/>
+      <!-- 背表紙と本文の境界線 -->
+      <line x1="7" y1="1" x2="7" y2="37" stroke="rgba(240,228,210,.25)" stroke-width="1"/>
+      <!-- ページを示す横線3本 -->
+      <line x1="12" y1="12" x2="26" y2="12" stroke="rgba(240,228,210,.35)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="12" y1="18" x2="26" y2="18" stroke="rgba(240,228,210,.35)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="12" y1="24" x2="22" y2="24" stroke="rgba(240,228,210,.25)" stroke-width="1" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="guide-title">冒頭収集館</div>
+  <div class="guide-title-sub">BOUTOU SHUUSHUKAN</div>
+  <div class="guide-rule"><div class="guide-rule-dot"></div></div>
+  <div class="guide-items">
+    <div class="guide-item">
+      <div class="guide-arrow">↕</div>
+      <div class="guide-desc"><strong>スワイプ・ホイール・キーで切替</strong>上下スワイプ、↑↓キー、マウスホイール、Spaceで次の冒頭へ</div>
+    </div>
+    <div class="guide-item">
+      <div class="guide-arrow">❤</div>
+      <div class="guide-desc"><strong>ハートで書棚に保存</strong>気になった冒頭をタップして保存。もう一度で解除</div>
+    </div>
+    <div class="guide-item">
+      <div class="guide-arrow">📚</div>
+      <div class="guide-desc"><strong>書棚で保存作品を確認</strong>右上の📚から保存した冒頭をいつでも読み返せる</div>
+    </div>
+    <div class="guide-item">
+      <div class="guide-arrow">≡</div>
+      <div class="guide-desc"><strong>メニューでジャンル・作家を絞込</strong>日替わり冒頭、ジャンル、作家名で絞り込み可能</div>
+    </div>
+  </div>
+  <div class="guide-env">推奨環境: iOS Safari / Android Chrome / PC Chrome・Edge</div>
+  <button class="guide-close" id="guide-close">は じ め る</button>
+  <a href="https://note.com/memetomamoru" target="_blank" rel="noopener" class="guide-note-link">note.com/memetomamoru</a>
+</div>
+
 </div><!-- /#app -->
 
 <script>
-// ===== 埋め込みブックリスト (500件) =====
-// ===== BOOK LIST (500件・メタデータのみ) =====
-// GitHub raw から取得したbooklist_final.json相当のデータ
-// 形式: {id, title, author, path}
-let BOOKLIST = null;
+// 墨滲みアニメーション削除済み
 
 // ===== CONSTANTS =====
-const BASE_URL = 'https://raw.githubusercontent.com/aozorahack/aozorabunko_text/master/';
+const BASE_URL   = 'https://raw.githubusercontent.com/aozorahack/aozorabunko_text/master/';
 const AOZORA_URL = 'https://www.aozora.gr.jp/cards/';
+let BOOKLIST = null;
 
-// 青空文庫記法を除去してクリーンな本文を返す
-function cleanText(raw) {
-  // ヘッダー区切り（---が10文字以上）で分割
+const AUTHOR_GENRE = {
+  // 純文学
+  '夏目漱石':'純文学','芥川竜之介':'純文学','太宰治':'純文学','森鴎外':'純文学',
+  '志賀直哉':'純文学','有島武郎':'純文学','国木田独歩':'純文学','島崎藤村':'純文学',
+  '田山花袋':'純文学','梶井基次郎':'純文学','横光利一':'純文学',
+  '葛西善蔵':'純文学','坂口安吾':'純文学','織田作之助':'純文学',
+  '萩原朔太郎':'純文学','牧野信一':'純文学',
+  // 恋愛・情念
+  '谷崎潤一郎':'恋愛・情念','永井荷風':'恋愛・情念',
+  '岡本かの子':'恋愛・情念','林芙美子':'恋愛・情念',
+  // 幻想・耽美
+  '宮沢賢治':'幻想・耽美','泉鏡花':'幻想・耽美',
+  '久生十蘭':'幻想・耽美','国枝史郎':'幻想・耽美',
+  // 探偵・推理
+  '江戸川乱歩':'探偵・推理','夢野久作':'探偵・推理',
+  '小酒井不木':'探偵・推理','浜尾四郎':'探偵・推理','海野十三':'探偵・推理',
+  // 怪談・怪異
+  '田中貢太郎':'怪談・怪異','岡本綺堂':'怪談・怪異',
+  // 社会・風俗
+  '宮本百合子':'社会・風俗','尾崎士郎':'社会・風俗',
+};
+
+const GENRE_ACCENT = {
+  '純文学':'#e8a04a','探偵・推理':'#4a9cc8','怪談・怪異':'#a050d0',
+  '恋愛・情念':'#d04070','幻想・耽美':'#30b060','社会・風俗':'#40a060'
+};
+
+function cleanText(raw){
   const parts = raw.split(/\-{10,}/);
-  // parts[0]=タイトル, [1]=記号説明, [2]=本文（最後は底本情報）
-  let body = parts.length >= 3 ? parts[2] : parts[parts.length - 1];
-  // 底本情報を除去
+  let body = parts.length >= 3 ? parts[2] : parts[parts.length-1];
   body = body.split('底本：')[0];
-  // 青空文庫記法除去
   body = body
-    .replace(/《[^》]*》/g, '')       // ルビ
-    .replace(/｜/g, '')               // ルビ開始記号
-    .replace(/〔[^〕]*〕/g, '')       // 注記
-    .replace(/［＃[^\]]*］/g, '')     // 入力者注
-    .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')       // 空行を詰める
-    .trim();
-  const cut = body.slice(0, 200);
-  const lastKuten = cut.lastIndexOf('。');
-  return lastKuten !== -1 ? cut.slice(0, lastKuten + 1) : cut.slice(0, 150);
+    .replace(/《[^》]*》/g,'').replace(/｜/g,'')
+    .replace(/〔[^〕]*〕/g,'').replace(/［＃[^］]*］/g,'')
+    .replace(/\r\n/g,'\n').replace(/\r/g,'\n')
+    .replace(/\n{3,}/g,'\n\n').trim();
+
+  // 章番号・見出し行を先頭から繰り返し除去
+  // パターン1: 数字・漢数字・記号のみの行（1〜6文字）
+  // パターン2: 「第〇〇」で始まる見出し行
+  // パターン3: 6文字以下で句点・読点なしの行
+  var headingPattern = /^([\s　]*(([一二三四五六七八九十百千〇0-9０-９※◎○●◆◇■□△▲▽▼\-―─━＊\*]{1,6}|第[^\n]{1,20})[\s　]*\n+|[^\n。、]{1,6}\n+))+/;
+  body = body.replace(headingPattern, '').trim();
+
+  // 先頭のダッシュ・記号を除去（「―むっつり…」のようなケース）
+  body = body.replace(/^[―─━\-＝＊※◎○●◆◇■□▲▽▼\s　]+/, '').trim();
+
+  const MAX = 250;
+  let result = '';
+  let pos = 0;
+
+  while(pos < body.length){
+    const kuten = body.indexOf('。', pos);
+    if(kuten === -1) break;
+    const candidate = body.slice(0, kuten + 1);
+    if(candidate.length > MAX) break;
+    result = candidate; // MAX以内なら常に更新
+    pos = kuten + 1;
+  }
+
+  // ① 句点が見つからない場合
+  if(!result){
+    const firstKuten = body.indexOf('。');
+    if(firstKuten !== -1){
+      // 第1文が長くてもMAXで強制カット
+      result = body.slice(0, Math.min(firstKuten + 1, MAX));
+    } else {
+      // 句点が全くない → 読点か改行か文字数で切る
+      const cut = body.slice(0, MAX);
+      const touten = cut.lastIndexOf('、');
+      const newline = cut.lastIndexOf('\n');
+      const boundary = Math.max(touten, newline);
+      result = boundary > 20 ? cut.slice(0, boundary + 1) : cut;
+    }
+  }
+
+  // 念のため最終的にMAXで強制カット（句点は保持）
+  if(result.length > MAX + 10){
+    const cut = result.slice(0, MAX);
+    const last = cut.lastIndexOf('。');
+    result = last > 10 ? result.slice(0, last + 1) : cut;
+  }
+
+  // ② 末尾が句点でなければ直前の句点まで切り詰め（最終保険）
+  // ただし結果が短すぎる場合はそのまま
+  result = result.trim();
+  if(result && !result.endsWith('。')){
+    const last = result.lastIndexOf('。');
+    if(last > 10) result = result.slice(0, last + 1);
+  }
+
+  // 短い前置き文（20文字以下）だけの場合は次の文も追加
+  if(result.length <= 20 && result.endsWith('。')){
+    var rest = body.slice(result.length);
+    var nextKuten = rest.indexOf('。');
+    if(nextKuten !== -1){
+      var nextSent = rest.slice(0, nextKuten + 1);
+      if(result.length + nextSent.length <= MAX) result = result + nextSent;
+    }
+  }
+
+  // 結果内の改行を除去して整形
+  result = result.replace(/\n+/g, ' ').trim();
+
+  return result;
 }
 
-// パスからaozora.gr.jpの図書カードURLを生成
-function toAozoraUrl(path) {
+function getFirstSentence(text){
+  if(!text) return '';
+  const idx = text.indexOf('。');
+  if(idx === -1 || idx > 80) return text.slice(0,50);
+  return text.slice(0, idx+1);
+}
+
+function toAozoraUrl(path){
   const m = path.match(/cards\/(\d+)\/files\/(\d+)_/);
-  return m ? `${AOZORA_URL}${m[1]}/card${m[2]}.html` : '#';
+  return m ? AOZORA_URL+m[1]+'/card'+m[2]+'.html' : '#';
 }
 
-// テキストキャッシュ
 const textCache = {};
-
-async function fetchText(path) {
-  if (textCache[path]) return textCache[path];
-  const url = BASE_URL + path;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+async function fetchText(path){
+  if(textCache[path]) return textCache[path];
+  const r = await fetch(BASE_URL+path);
+  if(!r.ok) throw new Error('HTTP '+r.status);
   const buf = await r.arrayBuffer();
   const text = new TextDecoder('shift_jis').decode(buf);
   const clean = cleanText(text);
@@ -750,435 +1214,568 @@ async function fetchText(path) {
 }
 
 // ===== STATE =====
-let list = [];
-let cur = 0;
-let lending = new Map(); // id → {title, author, path, text}
-let transitioning = false;
-let filterVal = 'all';
-
-// ===== DECK =====
+let list=[], cur=0, shelf=new Map(), transitioning=false, filterVal='all';
+document.getElementById('copy-year').textContent=new Date().getFullYear();
 const deck = document.getElementById('deck');
 let cards = [];
 
-// カードのローディング表示を更新
-function setCardText(el, text) {
-  const wrap = el.querySelector('.card-text');
-  if (wrap) {
-    wrap.textContent = text;
-    wrap.classList.remove('card-loading-txt');
-    wrap.style.animation = 'none';
-    wrap.style.color = '';
-  }
+function setCardText(el, text){
+  const w = el.querySelector('.card-text');
+  if(w){ w.textContent=text; w.classList.remove('card-loading-txt'); w.style.animation='none'; w.style.color=''; }
+  el.classList.remove('is-loading');
+}
+function setCardError(el){
+  const w = el.querySelector('.card-text');
+  if(w) w.textContent = '本文の取得に失敗しました。';
   el.classList.remove('is-loading');
 }
 
-function setCardError(el) {
-  const wrap = el.querySelector('.card-text');
-  if (wrap) wrap.textContent = '本文の取得に失敗しました。\n\n時間をおいて再読み込みしてください。';
-  el.classList.remove('is-loading');
-}
-
-function buildCard(w, idx) {
+function buildCard(w, idx){
+  const genre = AUTHOR_GENRE[w.author] || '純文学';
   const el = document.createElement('div');
   el.className = 'card is-loading';
   el.dataset.idx = idx;
-  el.dataset.id = w.id;
+  el.dataset.id   = w.id;
   el.dataset.path = w.path;
-  // ジャンルは著者名から推定（後で動的に設定）
-  el.dataset.g = '小説';
-
-  const lent = lending.has(w.id);
-  const aozoraUrl = toAozoraUrl(w.path);
-
-  el.innerHTML = `
-    <div class="card-bg"></div>
-    <div class="card-accent"></div>
-    <div class="card-top">
-      <div class="meta-genre">
-        <span class="genre-name">${w.author}</span>
-        <span class="pattern-name">loading...</span>
-      </div>
-      <span class="meta-counter">${idx + 1} / ${list.length}</span>
-    </div>
-    <div class="card-text-wrap">
-      <div class="card-text card-loading-txt">―　読み込み中　―</div>
-    </div>
-    <div class="card-bottom">
-      <div class="card-divider"></div>
-      <div class="card-author-row">
-        <div class="author-info">
-          <div class="author-name">${w.author}</div>
-          <div class="work-title">『${w.title}』</div>
-        </div>
-        <div class="card-actions">
-          <a href="${aozoraUrl}" target="_blank" rel="noopener" class="btn-src">原文</a>
-          <button class="btn-lend${lent ? ' is-lent' : ''}" data-id="${w.id}">${lent ? '返却' : '借出す'}</button>
-        </div>
-      </div>
-    </div>`;
-
-  el.querySelector('.btn-lend').addEventListener('click', e => {
-    e.stopPropagation();
-    const id = e.currentTarget.dataset.id;
-    if (lending.has(id)) {
-      lending.delete(id);
-    } else {
-      lending.set(id, { title: w.title, author: w.author, path: w.path, text: textCache[w.path] || null });
-    }
-    const isLent = lending.has(id);
-    e.currentTarget.classList.toggle('is-lent', isLent);
-    e.currentTarget.textContent = isLent ? '返却' : '借出す';
-    updateBadge();
-  });
-
+  el.dataset.g    = genre;
+  el.innerHTML =
+    '<div class="card-bg"></div>'+
+    '<div class="card-accent"></div>'+
+    '<div class="card-top">'+
+      '<div class="card-top-row">'+
+        '<span class="genre-badge">'+genre+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card-text-wrap">'+
+      '<div class="card-text card-loading-txt">―　読み込み中　―</div>'+
+    '</div>';
   return el;
 }
 
-function build() {
-  deck.innerHTML = '';
-  cards = [];
-  list.forEach((w, i) => {
-    const el = buildCard(w, i);
-    if (i === 0) el.classList.add('is-current');
+// ===== 日替わり冒頭：日付シードで決定 =====
+function getTodayIndex(len){
+  if(!len) return 0;
+  var d=new Date();
+  var seed=(d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate());
+  return seed % len;
+}
+
+function build(){
+  deck.innerHTML=''; cards=[];
+  
+  var displayList=list.slice();
+
+  // 「全て」or「日替わり冒頭」のとき日替わりを先頭に移動
+  if(filterVal==='all' || filterVal==='today'){
+    var todayIdx=getTodayIndex(displayList.length);
+    if(todayIdx>0){
+      var todayItem=displayList.splice(todayIdx,1)[0];
+      displayList.unshift(todayItem);
+    }
+  }
+
+  displayList.forEach(function(w,i){
+    var el = buildCard(w,i);
+    if(i===0){
+      el.classList.add('is-current');
+      // 「全て」or「日替わり冒頭」のときバッジを付ける
+      if(filterVal==='all' || filterVal==='today'){
+        var badge=document.createElement('div');
+        badge.className='today-badge';
+        badge.textContent='日替わり冒頭';
+        el.querySelector('.card-top').appendChild(badge);
+      }
+    }
     deck.appendChild(el);
     cards.push(el);
   });
-  cur = 0;
+  list=displayList;
+  cur=0;
   updateProgress();
   updateActionBar();
-  setTimeout(addSwipeHint, 800);
-  // 最初の3枚を先読み
   prefetch(0);
 }
 
-// 周辺カードをプリフェッチ
-async function prefetch(idx) {
-  const targets = [idx, idx + 1, idx + 2].filter(i => i >= 0 && i < list.length);
-  for (const i of targets) {
-    const w = list[i];
-    if (textCache[w.path]) {
-      // キャッシュ済みならカードに反映
-      updateCardText(i);
-      continue;
-    }
-    try {
-      await fetchText(w.path);
-      updateCardText(i);
-    } catch(e) {
-      if (cards[i]) setCardError(cards[i]);
-    }
+async function prefetch(idx){
+  var targets=[idx,idx+1,idx+2].filter(function(i){return i>=0&&i<list.length;});
+  for(var i=0;i<targets.length;i++){
+    var ti=targets[i], w=list[ti];
+    if(textCache[w.path]){ updateCardText(ti); continue; }
+    try{ await fetchText(w.path); updateCardText(ti); }
+    catch(e){ if(cards[ti]) setCardError(cards[ti]); }
   }
 }
 
-function updateCardText(idx) {
-  const w = list[idx];
-  const card = cards[idx];
-  if (!card || !w) return;
-  const text = textCache[w.path];
-  if (!text) return;
-  setCardText(card, text);
-  // 借出済みならテキストも更新
-  if (lending.has(w.id)) {
-    lending.get(w.id).text = text;
-  }
-  // pattern表示を更新（冒頭1文字で簡易判定）
-  const first = text.charAt(0);
-  const pattern = /「|『/.test(first) ? 'セリフ始まり' : /[一-龠ぁ-ん]/.test(first) ? '散文' : '書き出し';
-  const pEl = card.querySelector('.pattern-name');
-  if (pEl) pEl.textContent = pattern;
+function updateCardText(idx){
+  var w=list[idx], card=cards[idx];
+  if(!card||!w) return;
+  var text=textCache[w.path];
+  if(!text) return;
+  setCardText(card,text);
+  if(shelf.has(w.id)) shelf.get(w.id).text=text;
 }
 
-// ===== NAVIGATION =====
-function goTo(next) {
-  if (transitioning || next < 0 || next >= cards.length) return;
-  transitioning = true;
-
-  const prev = cards[cur];
-  const nextEl = cards[next];
-  const goDown = next > cur;
-
+function goTo(next){
+  if(transitioning||next<0||next>=cards.length) return;
+  transitioning=true;
+  var prev=cards[cur], nextEl=cards[next], goDown=next>cur;
   prev.classList.remove('is-current');
-  prev.style.transform = goDown ? 'translateY(-100vh)' : 'translateY(100vh)';
-  prev.style.opacity = '0';
-
-  nextEl.style.transition = 'none';
-  nextEl.style.transform = goDown ? 'translateY(100vh)' : 'translateY(-100vh)';
-  nextEl.style.opacity = '0';
+  prev.style.transform=goDown?'translateY(-100vh)':'translateY(100vh)';
+  prev.style.opacity='0';
+  nextEl.style.transition='none';
+  nextEl.style.transform=goDown?'translateY(100vh)':'translateY(-100vh)';
+  nextEl.style.opacity='0';
   nextEl.getBoundingClientRect();
-  nextEl.style.transition = '';
+  nextEl.style.transition='';
   nextEl.classList.add('is-current');
-  nextEl.style.transform = 'translateY(0)';
-  nextEl.style.opacity = '1';
-
-  cur = next;
+  nextEl.style.transform='translateY(0)';
+  nextEl.style.opacity='1';
+  cur=next;
   updateProgress();
   updateActionBar();
-
-  // 次の2枚をプリフェッチ
-  prefetch(next + 1);
-
-  setTimeout(() => {
-    prev.classList.remove('is-current');
-    prev.style.transform = '';
-    prev.style.opacity = '';
-    transitioning = false;
-  }, 500);
+  prefetch(next+1);
+  setTimeout(function(){
+    prev.style.transform=''; prev.style.opacity=''; transitioning=false;
+  },500);
 }
 
-const AUTHOR_GENRE={'夏目漱石':'純文学','芥川竜之介':'純文学','太宰治':'純文学','森鴎外':'純文学','志賀直哉':'純文学','有島武郎':'純文学','国木田独歩':'純文学','島崎藤村':'純文学','永井荷風':'純文学','谷崎潤一郎':'純文学','梶井基次郎':'純文学','横光利一':'純文学','葛西善蔵':'純文学','坂口安吾':'純文学','織田作之助':'純文学','岡本かの子':'純文学','宮沢賢治':'幻想・耽美','泉鏡花':'幻想・耽美','久生十蘭':'幻想・耽美','国枝史郎':'幻想・耽美','江戸川乱歩':'探偵・推理','夢野久作':'探偵・推理','小酒井不木':'探偵・推理','海野十三':'探偵・推理','田中貢太郎':'怪談・怪異','岡本綺堂':'怪談・怪異','吉川英治':'歴史・時代','山本周五郎':'歴史・時代','菊池寛':'歴史・時代'};
-function showBgOverlay(){document.getElementById('bg-overlay')?.classList.add('active');}
-function hideBgOverlay(){setTimeout(()=>document.getElementById('bg-overlay')?.classList.remove('active'),300);}
-function updateActionBar(){
-  const w=list[cur];if(!w)return;
-  const ae=document.getElementById('action-author');
-  const te=document.getElementById('action-title');
-  const se=document.getElementById('action-src');
-  const sh=document.getElementById('btn-shelf');
-  if(ae)ae.textContent=w.author;
-  if(te)te.textContent='\u300e'+w.title+'\u300f';
-  if(se)se.href=toAozoraUrl(w.path);
-  if(sh)sh.classList.toggle('has-items',lending.size>0);
-  document.body.setAttribute('data-genre',AUTHOR_GENRE[w.author]||'純文学');
-}
-function addSwipeHint(){
-  const c=cards[0];
-  if(c){c.classList.add('swipe-hint');setTimeout(()=>c.classList.remove('swipe-hint'),3000);}
-}
-function updateProgress() {
-  const prog = document.getElementById('progress');
-  const total = Math.min(cards.length, 14);
-  if (total < 2) { prog.innerHTML = ''; return; }
-  prog.innerHTML = Array.from({length: total}, (_, i) => {
-    const mapped = Math.round((i / (total - 1)) * (cards.length - 1));
-    const on = mapped === cur || (i === total - 1 && cur === cards.length - 1);
-    return `<div class="prog-dot${on ? ' on' : ''}"></div>`;
+function updateProgress(){
+  var prog=document.getElementById('progress');
+  var total=Math.min(cards.length,14);
+  if(total<2){prog.innerHTML='';return;}
+  prog.innerHTML=Array.from({length:total},function(_,i){
+    var mapped=Math.round((i/(total-1))*(cards.length-1));
+    var on=mapped===cur||(i===total-1&&cur===cards.length-1);
+    return '<div class="prog-dot'+(on?' on':'')+'"></div>';
   }).join('');
+  var counter=document.getElementById('card-counter');
+  if(counter) counter.textContent=(cur+1)+' / '+list.length;
+}
+
+function updateActionBar(){
+  var w=list[cur]; if(!w) return;
+  var ae=document.getElementById('action-author');
+  var te=document.getElementById('action-title');
+  var se=document.getElementById('action-src');
+  if(ae) ae.textContent=w.author;
+  if(te) te.textContent='『'+w.title+'』';
+  if(se) se.href=toAozoraUrl(w.path);
+  updateHeartBtn();
+  var appEl=document.getElementById('app');
+  if(appEl) appEl.setAttribute('data-genre', AUTHOR_GENRE[w.author]||'純文学');
+  // bg-overlayも#app基準に
+  var bg=document.getElementById('bg-overlay');
+  if(bg) bg.setAttribute('data-genre', AUTHOR_GENRE[w.author]||'純文学');
+  var gb=document.getElementById('grad-bg');
+  if(gb) gb.classList.add('active');
+}
+
+function updateHeartBtn(){
+  var hb=document.getElementById('btn-heart');
+  var w=list[cur]; if(!hb||!w) return;
+  var liked=shelf.has(w.id);
+  hb.classList.toggle('liked', liked);
+  // ヘッダーの書棚ボタンにバッジ
+  var badge=document.getElementById('shelf-header-badge');
+  if(badge){
+    badge.style.display=shelf.size>0?'flex':'none';
+    badge.textContent=shelf.size;
+  }
+}
+
+function saveCurrentToShelf(){
+  var w=list[cur]; if(!w) return;
+  var genre=AUTHOR_GENRE[w.author]||'純文学';
+  var hb=document.getElementById('btn-heart');
+  var toast=document.getElementById('saved-toast');
+
+  if(!shelf.has(w.id)){
+    // 保存
+    shelf.set(w.id,{
+      id:w.id, title:w.title, author:w.author,
+      path:w.path, text:textCache[w.path]||null, genre:genre
+    });
+    updateHeartBtn();
+    // ハートバウンス
+    if(hb){
+      hb.classList.remove('beat');
+      void hb.offsetWidth;
+      hb.classList.add('beat');
+      hb.addEventListener('animationend',function(){hb.classList.remove('beat');},{once:true});
+    }
+    // トースト
+    if(toast){
+      toast.textContent='❤ 書棚に追加しました';
+      toast.classList.remove('show');
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      toast.addEventListener('animationend',function(){toast.classList.remove('show');},{once:true});
+    }
+  } else {
+    // 解除（ハートをもう一度押したら取り消し）
+    shelf.delete(w.id);
+    updateHeartBtn();
+    if(toast){
+      toast.textContent='書棚から削除しました';
+      toast.classList.remove('show');
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      toast.addEventListener('animationend',function(){toast.classList.remove('show');},{once:true});
+    }
+  }
+}
+
+function showBgOverlay(){
+  document.getElementById('bg-overlay').classList.add('active');
+  var gb=document.getElementById('grad-bg');
+  if(gb){gb.classList.add('active');gb.classList.add('swiping');}
+  cards[cur]&&cards[cur].classList.add('swiping-active');
+}
+function hideBgOverlay(){
+  setTimeout(function(){
+    document.getElementById('bg-overlay').classList.remove('active');
+    var gb=document.getElementById('grad-bg');
+    if(gb) gb.classList.remove('swiping');
+  },300);
+  cards[cur]&&cards[cur].classList.remove('swiping-active');
 }
 
 // ===== SWIPE =====
-let ty0=0, tx0=0, swiping=false, swipeDelta=0;
-
-deck.addEventListener('touchstart', e => {
-  if (e.target.closest('button, a')) return;
-  ty0 = e.touches[0].clientY;
-  tx0 = e.touches[0].clientX;
-  swiping = false;
-  swipeDelta = 0;
-  showBgOverlay();
-}, {passive: true});
-
-deck.addEventListener('touchmove', e => {
-  if (e.target.closest('button, a')) return;
-  const dy = e.touches[0].clientY - ty0;
-  const dx = e.touches[0].clientX - tx0;
-  if (!swiping) {
-    if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) swiping = true;
-    else return;
-  }
-  e.preventDefault();
-  swipeDelta = dy;
-  const card = cards[cur];
-  if (!card) return;
-  const resist = Math.abs(dy) > 80 ? 80 + (Math.abs(dy) - 80) * 0.15 : Math.abs(dy);
-  card.style.transition = 'none';
-  card.style.transform = `translateY(${dy > 0 ? resist : -resist}px)`;
-}, {passive: false});
-
-deck.addEventListener('touchend', () => {
-  const card = cards[cur];
-  if (card) { card.style.transition = ''; card.style.transform = ''; }
+var ty0=0,tx0=0,swiping=false,swipeDelta=0;
+// action-bar より上の領域全体でスワイプ受付（ボタン類は除外）
+var swipeTarget=document.getElementById('app');
+swipeTarget.addEventListener('touchstart',function(e){
+  if(e.target.closest('button,a,#action-bar,#header-ui,#filter-drawer,#shelf-drawer,#share-overlay,#guide-overlay'))return;
+  ty0=e.touches[0].clientY; tx0=e.touches[0].clientX;
+  swiping=false; swipeDelta=0;
+},{passive:true});
+swipeTarget.addEventListener('touchmove',function(e){
+  if(e.target.closest('button,a,#action-bar,#header-ui,#filter-drawer,#shelf-drawer,#share-overlay,#guide-overlay'))return;
+  var dy=e.touches[0].clientY-ty0, dx=e.touches[0].clientX-tx0;
+  if(!swiping){ if(Math.abs(dy)>6&&Math.abs(dy)>Math.abs(dx)*0.8) swiping=true; else return; }
+  e.preventDefault(); swipeDelta=dy; showBgOverlay();
+  var card=cards[cur]; if(!card)return;
+  var resist=Math.abs(dy)>60?60+(Math.abs(dy)-60)*.12:Math.abs(dy);
+  card.style.transition='none';
+  card.style.transform='translateY('+(dy>0?resist:-resist)+'px)';
+},{passive:false});
+swipeTarget.addEventListener('touchend',function(e){
+  if(e.target.closest('button,a,#action-bar,#header-ui,#filter-drawer,#shelf-drawer,#share-overlay,#guide-overlay'))return;
   hideBgOverlay();
-  if (!swiping) return;
-  swiping = false;
-  if (swipeDelta < -55) goTo(cur + 1);
-  else if (swipeDelta > 55) goTo(cur - 1);
+  var card=cards[cur];
+  if(card){card.style.transition='';card.style.transform='';}
+  if(!swiping)return; swiping=false;
+  if(swipeDelta<-35) goTo(cur+1);
+  else if(swipeDelta>35) goTo(cur-1);
+},{passive:true});
+swipeTarget.addEventListener('touchcancel',function(){
+  hideBgOverlay(); swiping=false;
+  var card=cards[cur]; if(card){card.style.transition='';card.style.transform='';}
+},{passive:true});
+
+// PC ナビ矢印
+var navPrev=document.getElementById('nav-prev');
+var navNext=document.getElementById('nav-next');
+if(navPrev) navPrev.addEventListener('click',function(){goTo(cur-1);});
+if(navNext) navNext.addEventListener('click',function(){goTo(cur+1);});
+
+document.addEventListener('keydown',function(e){
+  if(document.getElementById('share-overlay').classList.contains('show')) return;
+  if(document.getElementById('filter-drawer').classList.contains('open')) return;
+  if(document.getElementById('shelf-drawer').classList.contains('open')) return;
+  if(e.key==='ArrowDown'||e.key==='j'||e.key===' '||e.key==='Enter') { e.preventDefault(); goTo(cur+1); }
+  if(e.key==='ArrowUp'  ||e.key==='k'||e.key==='Backspace') { e.preventDefault(); goTo(cur-1); }
+});
+
+// マウスホイール対応（Magic Mouse / トラックパッド対策）
+// 発火後は animationの完了(600ms)までハードロック
+var wheelLocked = false;
+var wheelAccum = 0;
+var wheelResetTimer = null;
+
+deck.addEventListener('wheel', function(e){
+  if(document.getElementById('share-overlay').classList.contains('show')) return;
+  if(wheelLocked) return;
+
+  wheelAccum += e.deltaY;
+
+  // 累積リセットタイマー（止まったら0に戻す）
+  clearTimeout(wheelResetTimer);
+  wheelResetTimer = setTimeout(function(){ wheelAccum = 0; }, 150);
+
+  // 閾値60を超えたら発火してハードロック
+  if(Math.abs(wheelAccum) < 60) return;
+
+  var dir = wheelAccum > 0 ? 1 : -1;
+  wheelAccum = 0;
+  wheelLocked = true;
+
+  goTo(cur + dir);
+
+  // アニメーション完了より少し長めにロック
+  setTimeout(function(){ wheelLocked = false; }, 650);
 }, {passive: true});
 
-deck.addEventListener('touchcancel', () => {
-  swiping = false;
-  const card = cards[cur];
-  if (card) { card.style.transition = ''; card.style.transform = ''; }
-}, {passive: true});
-
-// ===== PC: マウスホイールとドラッグ =====
-let wheelLock = false;
-deck.addEventListener('wheel', e => {
-  e.preventDefault();
-  if (wheelLock) return;
-  wheelLock = true;
-  setTimeout(() => { wheelLock = false; }, 700);
-  if (e.deltaY > 20) goTo(cur + 1);
-  else if (e.deltaY < -20) goTo(cur - 1);
-}, {passive: false});
-
-let my0 = 0, mDrag = false, mDelta = 0;
-deck.addEventListener('mousedown', e => {
-  if (e.target.closest('button, a')) return;
-  my0 = e.clientY; mDrag = true; mDelta = 0;
-});
-window.addEventListener('mousemove', e => {
-  if (!mDrag) return;
-  mDelta = e.clientY - my0;
-  const card = cards[cur]; if (!card) return;
-  const r = Math.abs(mDelta) > 80 ? 80 + (Math.abs(mDelta)-80)*0.15 : Math.abs(mDelta);
-  card.style.transition = 'none';
-  card.style.transform = `translateY(${mDelta>0?r:-r}px)`;
-});
-window.addEventListener('mouseup', () => {
-  if (!mDrag) return;
-  mDrag = false;
-  const card = cards[cur];
-  if (card) { card.style.transition=''; card.style.transform=''; }
-  if (mDelta < -55) goTo(cur + 1);
-  else if (mDelta > 55) goTo(cur - 1);
+// ===== ❤️ハートボタン：保存トグル =====
+document.getElementById('btn-heart').addEventListener('click',function(){
+  saveCurrentToShelf();
 });
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowDown' || e.key === 'j') goTo(cur + 1);
-  if (e.key === 'ArrowUp'   || e.key === 'k') goTo(cur - 1);
+// ===== 📚書棚ボタン（ヘッダー）：書棚を開く =====
+document.getElementById('btn-shelf-open').addEventListener('click',function(){
+  openShelf();
 });
 
 // ===== FILTER =====
-const filterDrawer = document.getElementById('filter-drawer');
-document.getElementById('btn-filter').addEventListener('click', () => {
-  filterDrawer.classList.toggle('open');
-});
-document.getElementById('filter-backdrop').addEventListener('click', () => {
-  filterDrawer.classList.remove('open');
-});
-document.querySelectorAll('.f-item').forEach(b => {
-  b.addEventListener('click', () => {
-    document.querySelectorAll('.f-item').forEach(x => x.classList.remove('on'));
+var filterDrawer=document.getElementById('filter-drawer');
+document.getElementById('btn-filter').addEventListener('click',function(){filterDrawer.classList.toggle('open');});
+document.getElementById('filter-backdrop').addEventListener('click',function(){filterDrawer.classList.remove('open');});
+document.querySelectorAll('.f-item').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.f-item').forEach(function(x){x.classList.remove('on');});
     b.classList.add('on');
-    filterVal = b.dataset.f;
+    filterVal=b.dataset.f;
+    filterAuthor=''; // ジャンル切替時は作家絞り込みリセット
+    document.querySelectorAll('.author-pill').forEach(function(p){p.classList.remove('on');});
     applyFilter();
     filterDrawer.classList.remove('open');
   });
 });
+var filterAuthor='';
 
-function applyFilter() {
-  if (!BOOKLIST) return;
-  // 著者名フィルター（シンプルに著者名で絞る）
-  const AUTHOR_GENRE = {
-    '夏目漱石': '純文学', '芥川竜之介': '純文学', '太宰治': '純文学',
-    '森鴎外': '純文学', '志賀直哉': '純文学', '有島武郎': '純文学',
-    '国木田独歩': '純文学', '島崎藤村': '純文学', '田山花袋': '純文学',
-    '永井荷風': '純文学', '谷崎潤一郎': '純文学', '川端康成': '純文学',
-    '梶井基次郎': '純文学', '横光利一': '純文学', '葛西善蔵': '純文学',
-    '坂口安吾': '純文学', '織田作之助': '純文学', '岡本かの子': '純文学',
-    '宮本百合子': '純文学', '林芙美子': '純文学',
-    '宮沢賢治': '幻想・耽美', '泉鏡花': '幻想・耽美', '久生十蘭': '幻想・耽美',
-    '国枝史郎': '幻想・耽美',
-    '江戸川乱歩': '探偵・推理', '夢野久作': '探偵・推理',
-    '小酒井不木': '探偵・推理', '浜尾四郎': '探偵・推理', '海野十三': '探偵・推理',
-    '田中貢太郎': '怪談・怪異', '岡本綺堂': '怪談・怪異',
-    '吉川英治': '歴史・時代', '山本周五郎': '歴史・時代', '菊池寛': '歴史・時代',
-  };
-  list = filterVal === 'all'
-    ? [...BOOKLIST]
-    : BOOKLIST.filter(w => (AUTHOR_GENRE[w.author] || '純文学') === filterVal);
+function applyFilter(){
+  if(!BOOKLIST)return;
+  var base=filterVal==='all'?[...BOOKLIST]:
+           filterVal==='today'?[...BOOKLIST]:
+           BOOKLIST.filter(function(w){return (AUTHOR_GENRE[w.author]||'純文学')===filterVal;});
+  if(filterAuthor){
+    base=base.filter(function(w){return w.author===filterAuthor;});
+  }
+  // 「日替わり冒頭」フィルターの場合は日替わり1枚だけに絞る
+  if(filterVal==='today'){
+    var todayIdx=getTodayIndex(base.length);
+    list=[base[todayIdx]||base[0]];
+  } else {
+    list=base;
+  }
   build();
 }
 
-// ===== SHELF =====
-function updateBadge(){
-  const n=lending.size;
-  const b=document.getElementById('shelf-badge');
-  if(b){b.style.display=n>0?'flex':'none';b.textContent=n;}
-  const sb=document.getElementById('btn-shelf');
-  if(sb)sb.classList.toggle('has-items',n>0);
-}
-
-document.getElementById('btn-shelf').addEventListener('click', () => {
-  document.getElementById('shelf-drawer').classList.add('open');
-  showShelfList();
-});
-document.getElementById('shelf-close').addEventListener('click', () => {
-  document.getElementById('shelf-drawer').classList.remove('open');
-});
-document.getElementById('reader-back').addEventListener('click', showShelfList);
-
-function showShelfList() {
-  document.getElementById('shelf-list-view').style.display = 'flex';
-  document.getElementById('shelf-reader-view').style.display = 'none';
-  renderShelf();
-}
-
-async function showReader(id) {
-  const item = lending.get(id);
-  if (!item) return;
-  document.getElementById('shelf-list-view').style.display = 'none';
-  document.getElementById('shelf-reader-view').style.display = 'flex';
-  document.getElementById('reader-title').textContent = `『${item.title}』`;
-  document.getElementById('reader-author').textContent = item.author;
-  document.getElementById('reader-src').href = toAozoraUrl(item.path);
-
-  const textEl = document.getElementById('reader-text');
-  if (item.text) {
-    textEl.textContent = item.text;
-  } else {
-    textEl.textContent = '読み込み中…';
-    try {
-      const text = await fetchText(item.path);
-      item.text = text;
-      textEl.textContent = text;
-    } catch(e) {
-      textEl.textContent = '取得に失敗しました。';
-    }
-  }
-
-  document.getElementById('reader-ret').onclick = () => {
-    lending.delete(id);
-    updateBadge();
-    // カードのボタンも更新
-    const card = cards.find(c => c.dataset.id === id);
-    if (card) {
-      const btn = card.querySelector('.btn-lend');
-      if (btn) { btn.classList.remove('is-lent'); btn.textContent = '借出す'; }
-    }
-    showShelfList();
-  };
-}
-
-function renderShelf() {
-  const bd = document.getElementById('shelf-bd');
-  if (!lending.size) {
-    bd.innerHTML = '<div class="shelf-empty">まだ何も借り出していません<br><br>気になった冒頭を「借出す」と<br>ここでいつでも読み返せます</div>';
-    return;
-  }
-  bd.innerHTML = [...lending.entries()].map(([id, item]) =>
-    `<div class="s-item" data-id="${id}">
-      <div class="s-info">
-        <div class="s-ttl">『${item.title}』</div>
-        <div class="s-auth">${item.author}</div>
-      </div>
-      <span class="s-arrow">›</span>
-    </div>`
-  ).join('');
-  bd.querySelectorAll('.s-item').forEach(el => {
-    el.addEventListener('click', () => showReader(el.dataset.id));
+function initAuthorList(){
+  if(!BOOKLIST)return;
+  var authors=[...new Set(BOOKLIST.map(function(w){return w.author;}))].sort();
+  var el=document.getElementById('author-list');
+  if(!el)return;
+  el.innerHTML=authors.map(function(a){
+    return '<button class="author-pill" data-author="'+a+'">'+a+'</button>';
+  }).join('');
+  el.querySelectorAll('.author-pill').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var author=btn.dataset.author;
+      if(filterAuthor===author){
+        filterAuthor='';
+        el.querySelectorAll('.author-pill').forEach(function(b){b.classList.remove('on');});
+      } else {
+        filterAuthor=author;
+        el.querySelectorAll('.author-pill').forEach(function(b){b.classList.remove('on');});
+        btn.classList.add('on');
+      }
+      applyFilter();
+      document.getElementById('filter-drawer').classList.remove('open');
+    });
   });
 }
 
-// ===== 初期化 =====
-async function init() {
-  try {
-    const r = await fetch('./booklist.json');
-    BOOKLIST = await r.json();
-  } catch(e) { BOOKLIST = []; }
-  list = [...BOOKLIST];
-  build();
+// ===== SHELF =====
+function openShelf(){
+  document.getElementById('shelf-drawer').classList.add('open');
+  showShelfList();
+}
+document.getElementById('shelf-close').addEventListener('click',function(){document.getElementById('shelf-drawer').classList.remove('open');});
+document.getElementById('reader-back').addEventListener('click',showShelfList);
+
+function showShelfList(){
+  document.getElementById('shelf-list-view').style.display='flex';
+  document.getElementById('shelf-reader-view').style.display='none';
+  renderShelf();
+}
+async function showReader(id){
+  var item=shelf.get(id); if(!item)return;
+  document.getElementById('shelf-list-view').style.display='none';
+  document.getElementById('shelf-reader-view').style.display='flex';
+  document.getElementById('reader-title').textContent='『'+item.title+'』';
+  document.getElementById('reader-author').textContent=item.author;
+  document.getElementById('reader-src').href=toAozoraUrl(item.path);
+  var textEl=document.getElementById('reader-text');
+  if(item.text){ textEl.textContent=item.text; }
+  else{
+    textEl.textContent='読み込み中…';
+    try{ var t=await fetchText(item.path); item.text=t; textEl.textContent=t; }
+    catch(e){ textEl.textContent='取得に失敗しました。'; }
+  }
+  document.getElementById('reader-ret').onclick=function(){
+    shelf.delete(id); updateHeartBtn(); showShelfList();
+  };
+}
+function renderShelf(){
+  var bd=document.getElementById('shelf-bd');
+  if(!shelf.size){
+    bd.innerHTML='<div class="shelf-empty"><div class="shelf-empty-icon">❤</div><div class="shelf-empty-text">まだ何も保存していません<br>気になった冒頭に❤をどうぞ</div></div>';
+    return;
+  }
+  var entries=[...shelf.entries()];
+  bd.innerHTML=entries.map(function(e){
+    var id=e[0], item=e[1];
+    return '<div class="s-item" data-id="'+id+'">'+
+      '<div class="s-info">'+
+        '<div class="s-ttl">『'+item.title+'』</div>'+
+        '<div class="s-auth">'+item.author+'</div>'+
+      '</div>'+
+      '<span class="s-arrow">›</span>'+
+    '</div>';
+  }).join('');
+  bd.querySelectorAll('.s-item').forEach(function(el){
+    el.addEventListener('click',function(ev){
+      showReader(el.dataset.id);
+    });
+  });
 }
 
-// CSSにローディングアニメーションを追加（スクリプトで動的に）
-const style = document.createElement('style');
-style.textContent = '.is-loading .card-text{color:rgba(255,255,255,.15)!important;font-style:italic}' +
-  '@keyframes shimmer{0%,100%{opacity:.15}50%{opacity:.3}}' +
-  '.card-loading-txt{animation:shimmer 1.5s ease infinite}';
-document.head.appendChild(style);
+// ===== シェア =====
+document.getElementById('btn-share').addEventListener('click',function(){
+  var w=list[cur]; if(!w)return;
+  var text=textCache[w.path]||'';
+  var sentence=getFirstSentence(text);
+  var genre=AUTHOR_GENRE[w.author]||'純文学';
+  var accent=GENRE_ACCENT[genre]||'#e8a04a';
+  document.getElementById('share-sentence').textContent=sentence;
+  document.getElementById('share-author').textContent=w.author;
+  document.getElementById('share-work').textContent='『'+w.title+'』';
+  document.getElementById('share-accent-line').style.background='linear-gradient(90deg,'+accent+',transparent)';
+  var commentEl=document.getElementById('share-comment');
+  if(commentEl) { commentEl.value=''; commentEl.disabled=false; }
+  document.getElementById('share-overlay').classList.add('show');
+});
+// share-comment textarea のタッチ伝播を止める
+var shareComment=document.getElementById('share-comment');
+if(shareComment){
+  ['touchstart','touchmove','touchend','touchcancel'].forEach(function(ev){
+    shareComment.addEventListener(ev,function(e){ e.stopPropagation(); },{passive:true});
+  });
+}
 
-// 起動
+document.getElementById('share-close-btn').addEventListener('click',function(){
+  document.getElementById('share-overlay').classList.remove('show');
+  var c=document.getElementById('share-comment'); if(c){c.value='';c.disabled=false;}
+});
+document.getElementById('share-img-btn').addEventListener('click',async function(){
+  var btn=this; btn.textContent='生成中…'; btn.disabled=true;
+  try{
+    var card=document.getElementById('share-card');
+    var origOverflow=card.style.overflow;
+    card.style.overflow='visible';
+    var canvas=await html2canvas(card,{backgroundColor:'#0e0c0a',scale:window.devicePixelRatio||1,useCORS:true,logging:false});
+    card.style.overflow=origOverflow;
+    var w=list[cur];
+    var link=document.createElement('a');
+    link.download='boutou_'+(w?w.author:'unknown')+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }catch(e){
+    var toast=document.getElementById('saved-toast');
+    if(toast){
+      toast.textContent='画像保存に失敗しました';
+      toast.classList.remove('show'); void toast.offsetWidth;
+      toast.classList.add('show');
+      toast.addEventListener('animationend',function(){toast.classList.remove('show');},{once:true});
+    }
+  }finally{
+    btn.textContent='画像保存'; btn.disabled=false;
+    var c=document.getElementById('share-comment'); if(c){c.value='';c.disabled=false;}
+    document.getElementById('share-overlay').classList.remove('show');
+  }
+});
+document.getElementById('share-x-btn').addEventListener('click',function(){
+  var w=list[cur]; if(!w)return;
+  var comment=document.getElementById('share-comment');
+  var commentText=comment&&comment.value.trim()?comment.value.trim()+'\n\n':'';
+  var tweetText=
+    commentText+
+    w.author+'『'+w.title+'』の冒頭を収集しました。\n\n'+
+    '#冒頭収集館 #青空文庫';
+  var url='https://boutou-shuushukan.vercel.app';
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweetText)+'&url='+encodeURIComponent(url),'_blank','noopener');
+  var c=document.getElementById('share-comment'); if(c){c.value='';c.disabled=false;}
+  document.getElementById('share-overlay').classList.remove('show');
+});
+
+// ===== PWAインストール訴求（SP・初回4秒後） =====
+(function(){
+  if(window.matchMedia('(display-mode: standalone)').matches) return;
+  if(navigator.standalone) return;
+  if(window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+
+  var PWA_KEY='boutou_pwa_dismissed';
+  if(localStorage.getItem(PWA_KEY)) return;
+
+  // 初回訪問から4秒後に表示
+  setTimeout(function(){
+    var banner=document.getElementById('pwa-banner');
+    if(banner) banner.classList.add('show');
+  }, 4000);
+
+  var closeBtn=document.getElementById('pwa-close');
+  if(closeBtn){
+    closeBtn.addEventListener('click',function(){
+      document.getElementById('pwa-banner').classList.remove('show');
+      localStorage.setItem(PWA_KEY,'1');
+    });
+  }
+})();
+var GUIDE_KEY='boutou_guide_v2'; // バージョン変えたら再表示される
+document.getElementById('guide-close').addEventListener('click',function(){
+  document.getElementById('guide-overlay').classList.remove('show');
+  localStorage.setItem(GUIDE_KEY, Date.now().toString()); // 閉じた日時を保存
+});
+
+// ===== 初期化 =====
+var styleEl=document.createElement('style');
+styleEl.textContent=
+  '.is-loading .card-text{color:rgba(255,255,255,.15)!important;font-style:italic}'+
+  '@keyframes shimmer{0%,100%{opacity:.15}50%{opacity:.3}}'+
+  '.card-loading-txt{animation:shimmer 1.5s ease infinite}';
+document.head.appendChild(styleEl);
+
+// インジケーターテキスト：PC/SP判定
+var indText=document.getElementById('swipe-ind-text');
+if(indText){
+  var isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+  indText.textContent=isTouch?'SWIPE':'SCROLL';
+}
+
+async function init(){
+  try{ var r=await fetch('./booklist.json'); BOOKLIST=await r.json(); }
+  catch(e){ BOOKLIST=[]; }
+  list=[...BOOKLIST];
+  initAuthorList();
+  build();
+  // ガイド表示：初回 または 30日経過後
+  var lastSeen = parseInt(localStorage.getItem(GUIDE_KEY)||'0');
+  var thirtyDays = 30 * 24 * 60 * 60 * 1000;
+  if(!lastSeen || Date.now() - lastSeen > thirtyDays){
+    document.getElementById('guide-overlay').classList.add('show');
+  }
+}
 init();
 </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .catch(e => console.warn('SW registration failed:', e));
+      });
+    }
+  </script>
 </body>
 </html>
