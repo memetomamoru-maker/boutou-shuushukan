@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>冒頭収集館</title><!-- v3 -->
+<title>冒頭収集館</title>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after {
@@ -592,13 +592,13 @@ body::before {
 
 #bg-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s ease,background .4s ease;}
 #bg-overlay.active{opacity:1;}
-body[data-genre="純文学"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(196,98,26,.35) 0%,transparent 65%);}
-body[data-genre="探偵・推理"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,96,160,.35) 0%,transparent 65%);}
-body[data-genre="怪談・怪異"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(120,32,160,.35) 0%,transparent 65%);}
-body[data-genre="恋愛・情念"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(160,32,64,.35) 0%,transparent 65%);}
-body[data-genre="歴史・時代"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(140,80,16,.35) 0%,transparent 65%);}
-body[data-genre="幻想・耽美"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(26,130,64,.35) 0%,transparent 65%);}
-body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,110,64,.35) 0%,transparent 65%);}
+body[data-genre="純文学"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(196,98,26,.3) 0%,transparent 65%);}
+body[data-genre="探偵・推理"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,96,160,.3) 0%,transparent 65%);}
+body[data-genre="怪談・怪異"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(120,32,160,.3) 0%,transparent 65%);}
+body[data-genre="恋愛・情念"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(160,32,64,.3) 0%,transparent 65%);}
+body[data-genre="歴史・時代"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(140,80,16,.3) 0%,transparent 65%);}
+body[data-genre="幻想・耽美"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(26,130,64,.3) 0%,transparent 65%);}
+body[data-genre="社会・風俗"] #bg-overlay{background:radial-gradient(ellipse at 50% 110%,rgba(42,110,64,.3) 0%,transparent 65%);}
 @keyframes swipeHint{0%{transform:translateY(0)}25%{transform:translateY(-22px)}50%{transform:translateY(0)}75%{transform:translateY(-12px)}100%{transform:translateY(0)}}
 .swipe-hint{animation:swipeHint 1.4s ease 1s 1 forwards;}
 #swipe-indicator{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;opacity:0;animation:swipeIndAnim 3s ease 1.5s 1 forwards;}
@@ -923,10 +923,22 @@ function goTo(next) {
 
 const AUTHOR_GENRE={'夏目漱石':'純文学','芥川竜之介':'純文学','太宰治':'純文学','森鴎外':'純文学','志賀直哉':'純文学','有島武郎':'純文学','国木田独歩':'純文学','島崎藤村':'純文学','永井荷風':'純文学','谷崎潤一郎':'純文学','梶井基次郎':'純文学','横光利一':'純文学','葛西善蔵':'純文学','坂口安吾':'純文学','織田作之助':'純文学','岡本かの子':'純文学','宮沢賢治':'幻想・耽美','泉鏡花':'幻想・耽美','久生十蘭':'幻想・耽美','国枝史郎':'幻想・耽美','江戸川乱歩':'探偵・推理','夢野久作':'探偵・推理','小酒井不木':'探偵・推理','海野十三':'探偵・推理','田中貢太郎':'怪談・怪異','岡本綺堂':'怪談・怪異','吉川英治':'歴史・時代','山本周五郎':'歴史・時代','菊池寛':'歴史・時代'};
 function showBgOverlay(){document.getElementById('bg-overlay')?.classList.add('active');}
-function hideBgOverlay(){setTimeout(()=>{document.getElementById('bg-overlay')?.classList.remove('active');},300);}
-function updateActionBar(){const w=list[cur];if(!w)return;const ae=document.getElementById('action-author'),te=document.getElementById('action-title'),se=document.getElementById('action-src'),sh=document.getElementById('btn-shelf');if(ae)ae.textContent=w.author;if(te)te.textContent='『'+w.title+'』';if(se)se.href=toAozoraUrl(w.path);if(sh)sh.classList.toggle('has-items',lending.size>0);document.body.setAttribute('data-genre',AUTHOR_GENRE[w.author]||'純文学');}
-function addSwipeHint(){const c=cards[0];if(c){c.classList.add('swipe-hint');setTimeout(()=>c.classList.remove('swipe-hint'),3000);}}
-
+function hideBgOverlay(){setTimeout(()=>document.getElementById('bg-overlay')?.classList.remove('active'),300);}
+function updateActionBar(){
+  const w=list[cur];if(!w)return;
+  const ae=document.getElementById('action-author');
+  const te=document.getElementById('action-title');
+  const se=document.getElementById('action-src');
+  const sh=document.getElementById('btn-shelf');
+  if(ae)ae.textContent=w.author;
+  if(te)te.textContent='\u300e'+w.title+'\u300f';
+  if(se)se.href=toAozoraUrl(w.path);
+  if(sh)sh.classList.toggle('has-items',lending.size>0);
+  document.body.setAttribute('data-genre',AUTHOR_GENRE[w.author]||'純文学');
+}
+function addSwipeHint(){
+  const c=cards[0];
+  if(c){c.classList.add('swipe-hint');setTimeout(()=>c.classList.remove('swipe-hint'),3000);}
 }
 function updateProgress() {
   const prog = document.getElementById('progress');
@@ -940,32 +952,49 @@ function updateProgress() {
 }
 
 // ===== SWIPE =====
-let ty0=0,tx0=0,swiping=false,swipeDelta=0;
-deck.addEventListener('touchstart',e=>{
-  if(e.target.closest('button,a'))return;
-  ty0=e.touches[0].clientY;tx0=e.touches[0].clientX;
-  swiping=false;swipeDelta=0;
-},{passive:true});
-deck.addEventListener('touchmove',e=>{
-  if(e.target.closest('button,a'))return;
-  const dy=e.touches[0].clientY-ty0,dx=e.touches[0].clientX-tx0;
-  if(!swiping){if(Math.abs(dy)>8&&Math.abs(dy)>Math.abs(dx))swiping=true;else return;}
-  e.preventDefault();swipeDelta=dy;showBgOverlay();
-  const card=cards[cur];if(!card)return;
-  const resist=Math.abs(dy)>80?80+(Math.abs(dy)-80)*.15:Math.abs(dy);
-  card.style.transition='none';card.style.transform=`translateY(${dy>0?resist:-resist}px)`;
-},{passive:false});
-deck.addEventListener('touchend',()=>{
+let ty0=0, tx0=0, swiping=false, swipeDelta=0;
+
+deck.addEventListener('touchstart', e => {
+  if (e.target.closest('button, a')) return;
+  ty0 = e.touches[0].clientY;
+  tx0 = e.touches[0].clientX;
+  swiping = false;
+  swipeDelta = 0;
+  showBgOverlay();
+}, {passive: true});
+
+deck.addEventListener('touchmove', e => {
+  if (e.target.closest('button, a')) return;
+  const dy = e.touches[0].clientY - ty0;
+  const dx = e.touches[0].clientX - tx0;
+  if (!swiping) {
+    if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) swiping = true;
+    else return;
+  }
+  e.preventDefault();
+  swipeDelta = dy;
+  const card = cards[cur];
+  if (!card) return;
+  const resist = Math.abs(dy) > 80 ? 80 + (Math.abs(dy) - 80) * 0.15 : Math.abs(dy);
+  card.style.transition = 'none';
+  card.style.transform = `translateY(${dy > 0 ? resist : -resist}px)`;
+}, {passive: false});
+
+deck.addEventListener('touchend', () => {
+  const card = cards[cur];
+  if (card) { card.style.transition = ''; card.style.transform = ''; }
   hideBgOverlay();
-  const card=cards[cur];
-  if(card){card.style.transition='';card.style.transform='';}
-  if(!swiping)return;swiping=false;
-  if(swipeDelta<-55)goTo(cur+1);else if(swipeDelta>55)goTo(cur-1);
-},{passive:true});
-deck.addEventListener('touchcancel',()=>{
-  hideBgOverlay();swiping=false;
-  const card=cards[cur];if(card){card.style.transition='';card.style.transform='';}
-},{passive:true});
+  if (!swiping) return;
+  swiping = false;
+  if (swipeDelta < -55) goTo(cur + 1);
+  else if (swipeDelta > 55) goTo(cur - 1);
+}, {passive: true});
+
+deck.addEventListener('touchcancel', () => {
+  swiping = false;
+  const card = cards[cur];
+  if (card) { card.style.transition = ''; card.style.transform = ''; }
+}, {passive: true});
 
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowDown' || e.key === 'j') goTo(cur + 1);
@@ -1015,7 +1044,13 @@ function applyFilter() {
 }
 
 // ===== SHELF =====
-function updateBadge(){const n=lending.size,b=document.getElementById('shelf-badge');if(b){b.style.display=n>0?'flex':'none';b.textContent=n;}const sb=document.getElementById('btn-shelf');if(sb)sb.classList.toggle('has-items',n>0);}
+function updateBadge(){
+  const n=lending.size;
+  const b=document.getElementById('shelf-badge');
+  if(b){b.style.display=n>0?'flex':'none';b.textContent=n;}
+  const sb=document.getElementById('btn-shelf');
+  if(sb)sb.classList.toggle('has-items',n>0);
+}
 
 document.getElementById('btn-shelf').addEventListener('click', () => {
   document.getElementById('shelf-drawer').classList.add('open');
